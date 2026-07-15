@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "1-Wire 单总线协议详解"
 date: 2026-07-15 17:30:00 +0800
 categories: [串口系列, 1-Wire]

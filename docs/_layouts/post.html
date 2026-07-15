@@ -50,13 +50,14 @@
       blocks.forEach(function(block) {
         try {
           var raw = block.textContent || block.innerText;
-          var data = JSON.parse(raw);
+          // WaveDrom uses JS object notation (unquoted keys), not strict JSON
+          var data = (new Function('return (' + raw + ')'))();
           var container = document.createElement('div');
-          block.parentNode.parentNode.replaceChild(container, block.parentNode);
+          block.parentNode.replaceChild(container, block);
           WaveDrom.renderWaveForm(0, data, container);
         } catch (e) {
-          // Invalid JSON or render error, leave as code block
-          console.warn('WaveDrom parse/render error:', e);
+          // Parse/render error, leave code block as-is
+          console.warn('WaveDrom render error:', e);
         }
       });
     });

@@ -1,4 +1,5 @@
 ---
+layout: post
 title: "UART 串口协议详解"
 date: 2026-07-15 17:30:00 +0800
 categories: [串口系列, UART]
