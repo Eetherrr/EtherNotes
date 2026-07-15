@@ -33,8 +33,8 @@ minima:
 # Column definitions — maps _posts/ subdirectory to display name
 # New columns are automatically discovered; add display name here
 columns:
-  interface_protocol: "接口协议"
-  hardware_manual: "硬件手册"
+  hardware: "硬件区"
+  software: "软件区"
 
 # Exclude from processing
 exclude:
