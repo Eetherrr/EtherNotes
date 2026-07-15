@@ -1,3 +1,36 @@
+# Site settings
 title: EtherNotes
-description: 我的知识博客
+description: 个人知识笔记 — FPGA、嵌入式、以及各种杂七杂八的东西
 theme: minima
+
+# Language & timezone
+lang: zh-CN
+timezone: Asia/Shanghai
+
+# Author info
+author:
+  name: Ether
+  avatar: /assets/images/avatar.jpg
+  bio: FPGA & 嵌入式开发者，也折腾各种杂七杂八的东西。这里记录我的学习笔记和想法。
+
+# Social
+github_username: Eetherrr
+qq_number: "941288046"  # 填入你的 QQ 号
+
+# Build settings
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed
+  - jekyll-sitemap
+
+# Minima settings
+minima:
+  skin: auto
+  social_links:
+    - platform: github
+      user_url: "https://github.com/Eetherrr"
+
+# Exclude from processing
+exclude:
+  - Gemfile
+  - Gemfile.lock

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'zh-CN' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  {% feed_meta %}
+  {% seo %}
+</head>
+<body>
+  {% include header.html %}
+
+  <main class="home">
+    <!-- ============================================================
+    HERO / PROFILE SECTION
+    ============================================================ -->
+    <section class="hero">
+      <div class="hero-avatar">
+        {% if site.author.avatar %}
+          <img src="{{ site.author.avatar | relative_url }}" alt="{{ site.author.name | default: site.title }}" width="120" height="120">
+        {% else %}
+          <div class="hero-avatar-placeholder">
+            {% assign initials = site.author.name | default: site.title | split: ' ' %}
+            {% assign first = initials[0] | slice: 0 %}
+            {% assign last = initials[-1] | slice: 0 %}
+            {{ first }}{{ last }}
+          </div>
+        {% endif %}
+      </div>
+
+      <h1 class="hero-name">
+        {{ site.author.name | default: site.title }}<span class="cursor"></span>
+      </h1>
+
+      {% if site.author.bio %}
+      <p class="hero-bio">{{ site.author.bio }}</p>
+      {% endif %}
+
+      <div class="hero-social">
+        {% if site.github_username %}
+        <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        {% endif %}
+        {% if site.qq_number %}
+        <a href="https://wpa.qq.com/msgrd?v=3&uin={{ site.qq_number }}&site=qq&menu=yes" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm4.9 17.5c-.2.5-1.1.8-1.9.7-.3 0-.4-.1-.5-.2-.4-.3-.7-.8-1-1.2-.3-.4-.9-.6-1.4-.6-.5 0-1.1.2-1.4.6-.3.4-.6.9-1 1.2-.1.1-.2.2-.5.2-.8.1-1.7-.2-1.9-.7-.2-.5-.1-1.1.2-1.5.3-.4.7-.7 1-1 .3-.3.6-.6.7-1 0-.3-.2-.6-.5-.9-1.5-1.5-2.6-3.5-2.6-5.5 0-4.4 3.6-6.5 7-6.5s7 2.1 7 6.5c0 2-.9 4-2.4 5.5-.3.3-.5.6-.5.9.1.4.4.7.7 1 .3.3.7.6 1 1 .3.4.4 1 .2 1.5z"/></svg>
+          QQ
+        </a>
+        {% endif %}
+      </div>
+    </section>
+
+    <!-- ============================================================
+    CATEGORY FILTER TABS
+    ============================================================ -->
+    {% assign all_categories = site.categories | sort %}
+    {% if all_categories.size > 0 %}
+    <nav class="category-tabs">
+      <button class="category-tab active" data-category="__all__">全部</button>
+      {% for cat in all_categories %}
+      <button class="category-tab" data-category="{{ cat[0] }}">{{ cat[0] }}</button>
+      {% endfor %}
+    </nav>
+    {% endif %}
+
+    <!-- ============================================================
+    POST CARD GRID
+    ============================================================ -->
+    <section class="post-grid">
+      {% assign has_posts = false %}
+      {% for post in site.posts %}
+        {% if post.title and post.url %}
+          {% assign has_posts = true %}
+          <article
+            class="post-card"
+            data-categories="{{ post.categories | join: ',' }}"
+            data-category="{{ post.categories | last }}"
+          >
+            <!-- Category badge -->
+            {% assign cat = post.categories | last %}
+            <div class="post-card-category">{{ cat }}</div>
+
+            <!-- Title -->
+            <h2 class="post-card-title">
+              <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+            </h2>
+
+            <!-- Meta: date + reading time -->
+            <div class="post-card-meta">
+              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+              <span class="post-card-reading-time">
+                {% assign word_count = post.content | number_of_words %}
+                {% assign read_time = word_count | divided_by: 300 | plus: 1 %}
+                ~{{ read_time }} 分钟阅读
+              </span>
+            </div>
+
+            <!-- Excerpt -->
+            {% if post.excerpt %}
+            <p class="post-card-excerpt">{{ post.excerpt | strip_html | truncate: 150 }}</p>
+            {% endif %}
+          </article>
+        {% endif %}
+      {% endfor %}
+
+      {% unless has_posts %}
+      <div class="post-grid-empty">
+        <p>📝 还没有文章，开始写第一篇吧～</p>
+      </div>
+      {% endunless %}
+    </section>
+  </main>
+
+  {% include footer.html %}
+
+  <!-- ============================================================
+  CATEGORY FILTER — Vanilla JS
+  ============================================================ -->
+  <script>
+  (function() {
+    var tabs = document.querySelectorAll('.category-tab');
+    var cards = document.querySelectorAll('.post-card');
+
+    if (!tabs.length || !cards.length) return;
+
+    tabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        var category = this.getAttribute('data-category');
+
+        // Toggle active class
+        tabs.forEach(function(t) { t.classList.remove('active'); });
+        this.classList.add('active');
+
+        // Show/hide cards
+        cards.forEach(function(card) {
+          if (category === '__all__') {
+            card.style.display = '';
+            return;
+          }
+          var cardCategories = card.getAttribute('data-categories') || '';
+          // Check if card belongs to this category
+          if (cardCategories.split(',').indexOf(category) !== -1) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  })();
+  </script>
+</body>
+</html>
