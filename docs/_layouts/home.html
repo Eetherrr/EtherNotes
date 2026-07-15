@@ -50,120 +50,115 @@
     </section>
 
     <!-- ============================================================
-    COLUMNS & SERIES — grouped by _posts/ directory structure
+    MAIN CONTENT — Columns → Sub-columns → Series
     ============================================================ -->
 
+    {% if site.posts.size == 0 %}
+    <section class="post-grid"><div class="post-grid-empty"><p>📝 还没有文章～</p></div></section>
+    {% else %}
+
     {% comment %}
-    Step 1: collect unique column directories from all posts
+    Step 1: collect unique columns (parts[1])
     {% endcomment %}
-    {% assign col_dirs_str = "" %}
+    {% assign cols_str = "" %}
     {% for post in site.posts %}
       {% assign parts = post.path | split: "/" %}
-      {% assign col_dir = parts[1] %}
-      {% unless col_dirs_str contains col_dir %}
-        {% assign col_dirs_str = col_dirs_str | append: col_dir | append: "|" %}
-      {% endunless %}
+      {% assign c = parts[1] %}
+      {% unless cols_str contains c %}{% assign cols_str = cols_str | append: c | append: "|" %}{% endunless %}
     {% endfor %}
-    {% assign col_dirs = col_dirs_str | split: "|" %}
+    {% assign columns = cols_str | split: "|" %}
 
-    {% if col_dirs.size > 0 %}
     <!-- Quick-jump nav -->
     <nav class="column-nav">
-      {% for col_dir in col_dirs %}
-        {% if col_dir != "" %}
-          {% assign col_name = site.columns[col_dir] | default: col_dir %}
-          <a href="#column-{{ col_dir | slugify }}" class="column-nav-link">{{ col_name }}</a>
+      {% for col in columns %}
+        {% if col != "" %}
+          {% assign col_name = site.dir_names[col] | default: col %}
+          <a href="#col-{{ col | slugify }}" class="column-nav-link">{{ col_name }}</a>
         {% endif %}
       {% endfor %}
     </nav>
 
     {% comment %}
-    Step 2: for each column, display posts grouped by series
+    Step 2: for each column → sub-columns → series
     {% endcomment %}
-    {% for col_dir in col_dirs %}
-      {% if col_dir == "" %}{% continue %}{% endif %}
-      {% assign col_name = site.columns[col_dir] | default: col_dir %}
-      {% assign col_slug = col_dir | slugify %}
+    {% for col in columns %}
+      {% if col == "" %}{% continue %}{% endif %}
+      {% assign col_name = site.dir_names[col] | default: col %}
 
-      <section id="column-{{ col_slug }}" class="column">
+      <section id="col-{{ col | slugify }}" class="column">
         <h2 class="column-title">{{ col_name }}</h2>
 
-        {% comment %}
-        Step 3: within this column, group posts by series (second-level dir)
-        {% endcomment %}
-        {% assign series_dirs_str = "" %}
-        {% assign no_series_posts = "" %}
-
+        {% comment %}Collect sub-columns for this column{% endcomment %}
+        {% assign subs_str = "" %}
         {% for post in site.posts %}
           {% assign parts = post.path | split: "/" %}
-          {% assign p_col = parts[1] %}
-          {% if p_col != col_dir %}{% continue %}{% endif %}
-
-          {% comment %}Determine series: parts[2] is series dir if it exists and isn't the filename{% endcomment %}
-          {% assign depth = parts | size %}
-          {% if depth >= 4 %}
-            {% comment %}Has series subdir: _posts/col/series/file.md → depth=4{% endcomment %}
-            {% assign series_dir = parts[2] %}
-            {% unless series_dirs_str contains series_dir %}
-              {% assign series_dirs_str = series_dirs_str | append: series_dir | append: "|" %}
-            {% endunless %}
-          {% else %}
-            {% comment %}No series: _posts/col/file.md → depth=3{% endcomment %}
-            {% assign no_series_posts = no_series_posts | append: post.url | append: "|||" %}
+          {% if parts[1] != col %}{% continue %}{% endif %}
+          {% assign sub = parts[2] %}
+          {% if sub and sub != "" %}
+            {% unless subs_str contains sub %}{% assign subs_str = subs_str | append: sub | append: "|" %}{% endunless %}
           {% endif %}
         {% endfor %}
+        {% assign subcols = subs_str | split: "|" %}
 
-        {% assign series_list = series_dirs_str | split: "|" %}
+        {% comment %}Render each sub-column{% endcomment %}
+        {% for sub in subcols %}
+          {% if sub == "" %}{% continue %}{% endif %}
+          {% assign sub_name = site.dir_names[sub] | default: sub | replace: "-", " " | replace: "_", " " %}
+          {% assign sub_slug = sub | slugify %}
 
-        {% comment %}
-        Step 4: render each series group
-        {% endcomment %}
-        {% for series_dir in series_list %}
-          {% if series_dir == "" %}{% continue %}{% endif %}
-          {% assign series_name = series_dir | replace: "-", " " | replace: "_", " " %}
-          <div class="series">
-            <h3 class="series-title">{{ series_name }}</h3>
+          <div class="subcolumn">
+            <h3 class="subcolumn-title">{{ sub_name }}</h3>
+
+            {% comment %}Collect series within this sub-column{% endcomment %}
+            {% assign series_str = "" %}
+            {% assign direct_posts = false %}
+            {% for post in site.posts %}
+              {% assign parts = post.path | split: "/" %}
+              {% if parts[1] != col or parts[2] != sub %}{% continue %}{% endif %}
+              {% assign depth = parts | size %}
+              {% if depth >= 5 %}
+                {% comment %}Has series: _posts/col/sub/series/file.md{% endcomment %}
+                {% assign ser = parts[3] %}
+                {% unless series_str contains ser %}{% assign series_str = series_str | append: ser | append: "|" %}{% endunless %}
+              {% else %}
+                {% comment %}No series: _posts/col/sub/file.md{% endcomment %}
+                {% assign direct_posts = true %}
+              {% endif %}
+            {% endfor %}
+            {% assign series_list = series_str | split: "|" %}
+
+            {% comment %}Posts with series{% endcomment %}
+            {% for ser in series_list %}
+              {% if ser == "" %}{% continue %}{% endif %}
+              {% assign ser_name = ser | replace: "-", " " | replace: "_", " " %}
+              <div class="series">
+                <h4 class="series-title">{{ ser_name }}</h4>
+                <div class="post-grid">
+                  {% for post in site.posts %}
+                    {% assign parts = post.path | split: "/" %}
+                    {% if parts[1] == col and parts[2] == sub and parts[3] == ser %}
+                      {% include post-card.html post=post %}
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+
+            {% comment %}Posts without series (directly under sub-column){% endcomment %}
+            {% if direct_posts %}
             <div class="post-grid">
               {% for post in site.posts %}
                 {% assign parts = post.path | split: "/" %}
-                {% assign p_col = parts[1] %}
-                {% assign p_series = parts[2] %}
-                {% if p_col != col_dir or p_series != series_dir %}{% continue %}{% endif %}
-                {% include post-card.html post=post %}
+                {% if parts[1] == col and parts[2] == sub and parts.size < 5 %}
+                  {% include post-card.html post=post %}
+                {% endif %}
               {% endfor %}
             </div>
+            {% endif %}
           </div>
         {% endfor %}
-
-        {% comment %}
-        Step 5: posts without series (directly in column dir)
-        {% endcomment %}
-        {% assign no_series_arr = no_series_posts | split: "|||" %}
-        {% assign has_no_series = false %}
-        {% for u in no_series_arr %}{% if u != "" %}{% assign has_no_series = true %}{% break %}{% endif %}{% endfor %}
-
-        {% if has_no_series %}
-        <div class="post-grid">
-          {% for post in site.posts %}
-            {% assign parts = post.path | split: "/" %}
-            {% if parts[1] != col_dir %}{% continue %}{% endif %}
-            {% if parts.size >= 4 %}{% continue %}{% endif %}
-            {% include post-card.html post=post %}
-          {% endfor %}
-        </div>
-        {% endif %}
       </section>
     {% endfor %}
-    {% endif %}
-
-    {% comment %}Fallback: no posts at all{% endcomment %}
-    {% assign total_posts = site.posts | size %}
-    {% if total_posts == 0 %}
-    <section class="post-grid">
-      <div class="post-grid-empty">
-        <p>📝 还没有文章，开始写第一篇吧～</p>
-      </div>
-    </section>
     {% endif %}
 
   </main>

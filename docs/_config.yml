@@ -30,11 +30,13 @@ minima:
     - platform: github
       user_url: "https://github.com/Eetherrr"
 
-# Column definitions — maps _posts/ subdirectory to display name
-# New columns are automatically discovered; add display name here
-columns:
+# Display name mapping for directories (any depth under _posts/)
+# New directories are auto-discovered; add display names here
+dir_names:
   hardware: "硬件区"
   software: "软件区"
+  protocol: "接口协议"
+  manual: "手册"
 
 # Exclude from processing
 exclude:

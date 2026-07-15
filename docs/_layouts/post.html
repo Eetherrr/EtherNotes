@@ -15,38 +15,137 @@
 <body>
   {% include header.html %}
 
-  <main class="page-content" role="main">
-    <article class="post">
-      <header class="post-header">
-        <h1 class="post-title">{{ page.title }}</h1>
-        <div class="post-meta">
-          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
-          {% if page.categories %}
-          <span class="post-categories">
-            {% for cat in page.categories %}
-            <span class="post-category">{{ cat }}</span>
-            {% endfor %}
-          </span>
-          {% endif %}
-        </div>
-      </header>
+  {% comment %}
+  Determine series info from page.path
+  _posts/COLUMN/SUBCOLUMN/[SERIES/]file.md
+  {% endcomment %}
+  {% assign path_parts = page.path | split: "/" %}
+  {% assign col_dir = path_parts[1] %}
+  {% assign sub_dir = path_parts[2] %}
+  {% assign has_series = false %}
+  {% if path_parts.size >= 5 %}
+    {% assign series_dir = path_parts[3] %}
+    {% assign has_series = true %}
+  {% endif %}
 
-      <div class="post-content">
-        {{ content }}
+  {% comment %}Collect series posts if in a series{% endcomment %}
+  {% if has_series %}
+    {% assign series_posts = "" | split: "" %}
+    {% for p in site.posts %}
+      {% assign pp = p.path | split: "/" %}
+      {% if pp[1] == col_dir and pp[2] == sub_dir and pp[3] == series_dir %}
+        {% assign series_posts = series_posts | push: p %}
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+
+  <div class="post-wrapper{% if has_series %} has-sidebar{% endif %}">
+
+    {% if has_series %}
+    <!-- ============================================================
+    SERIES SIDEBAR
+    ============================================================ -->
+    <aside class="post-sidebar">
+      <div class="sidebar-header">
+        {% assign col_name = site.dir_names[col_dir] | default: col_dir %}
+        {% assign sub_name = site.dir_names[sub_dir] | default: sub_dir | replace: "-", " " | replace: "_", " " %}
+        <a href="{{ '/' | relative_url }}#col-{{ col_dir | slugify }}" class="sidebar-breadcrumb">{{ col_name }}</a>
+        <span class="sidebar-sep">›</span>
+        <span class="sidebar-breadcrumb-current">{{ sub_name }}</span>
       </div>
-    </article>
-  </main>
+
+      <div class="sidebar-series">
+        <h4 class="sidebar-series-name">{{ series_dir | replace: "-", " " | replace: "_", " " }}</h4>
+        <span class="sidebar-count">{{ series_posts.size }} 篇文章</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <ul>
+          {% for sp in series_posts %}
+          <li>
+            <a href="{{ sp.url | relative_url }}"
+               class="sidebar-link{% if sp.url == page.url %} active{% endif %}">
+              {{ sp.title }}
+            </a>
+          </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+    {% endif %}
+
+    <!-- ============================================================
+    ARTICLE CONTENT
+    ============================================================ -->
+    <main class="post-main" role="main">
+      <article class="post">
+        <header class="post-header">
+          <h1 class="post-title">{{ page.title }}</h1>
+          <div class="post-meta">
+            <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+            {% if page.categories %}
+            <span class="post-categories">
+              {% for cat in page.categories %}
+              <span class="post-category">{{ cat }}</span>
+              {% endfor %}
+            </span>
+            {% endif %}
+          </div>
+        </header>
+
+        <div class="post-content">
+          {{ content }}
+        </div>
+
+        {% if has_series %}
+        {% comment %}Prev/Next navigation within series{% endcomment %}
+        {% assign prev_post = nil %}
+        {% assign next_post = nil %}
+        {% assign found_current = false %}
+        {% for sp in series_posts %}
+          {% if found_current == false and sp.url == page.url %}
+            {% assign found_current = true %}
+          {% elsif found_current and next_post == nil %}
+            {% assign next_post = sp %}
+          {% elsif found_current == false %}
+            {% assign prev_post = sp %}
+          {% endif %}
+        {% endfor %}
+
+        {% if prev_post or next_post %}
+        <nav class="post-series-nav">
+          {% if prev_post %}
+          <a href="{{ prev_post.url | relative_url }}" class="series-nav-link prev">
+            <span class="nav-label">← 上一篇</span>
+            <span class="nav-title">{{ prev_post.title }}</span>
+          </a>
+          {% else %}
+          <span class="series-nav-link prev empty"></span>
+          {% endif %}
+
+          {% if next_post %}
+          <a href="{{ next_post.url | relative_url }}" class="series-nav-link next">
+            <span class="nav-label">下一篇 →</span>
+            <span class="nav-title">{{ next_post.title }}</span>
+          </a>
+          {% else %}
+          <span class="series-nav-link next empty"></span>
+          {% endif %}
+        </nav>
+        {% endif %}
+        {% endif %}
+      </article>
+    </main>
+  </div>
 
   {% include footer.html %}
 
-  <!-- WaveDrom: render timing diagrams from ```wavedrom blocks -->
+  <!-- WaveDrom -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/skins/default.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/wavedrom.min.js"></script>
   <script>
     (function() {
       if (typeof WaveDrom === 'undefined') return;
-
-      // Convert ```wavedrom code blocks to <script type="WaveDrom"> elements
       var blocks = document.querySelectorAll('.language-wavedrom');
       blocks.forEach(function(block) {
         try {
@@ -59,8 +158,6 @@
           console.warn('WaveDrom convert error:', e);
         }
       });
-
-      // Let WaveDrom process all <script type="WaveDrom"> elements
       WaveDrom.processAll();
     })();
   </script>
