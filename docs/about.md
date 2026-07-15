@@ -6,9 +6,7 @@ permalink: /about/
 
 # 关于 EtherNotes
 
-嗨，我是 **Ether** 👋
-
-一名 FPGA 和嵌入式开发者，平时也折腾各种杂七杂八的东西——硬件、软件、工具链，什么好玩玩什么。
+我是 **Ether** 👋
 
 ## 关于本站
 
@@ -20,7 +18,7 @@ EtherNotes 是我的个人知识笔记。这里没有什么特定的主题限制
 
 没有固定方向，写到哪里算哪里。
 
-## 联系我
+## 个人信息
 
 - **GitHub**: [@Eetherrr](https://github.com/Eetherrr)
 
