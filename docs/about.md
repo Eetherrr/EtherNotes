@@ -18,9 +18,9 @@ EtherNotes 是我的个人知识笔记。这里没有什么特定的主题限制
 
 没有固定方向，写到哪里算哪里。
 
-## 个人信息
+## 项目地址
 
-- **GitHub**: [@Eetherrr](https://github.com/Eetherrr)
+- **GitHub**: [@Eetherrr](https://github.com/Eetherrr/EtherNotes)
 
 ---
 

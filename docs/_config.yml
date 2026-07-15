@@ -30,6 +30,12 @@ minima:
     - platform: github
       user_url: "https://github.com/Eetherrr"
 
+# Column definitions — maps _posts/ subdirectory to display name
+# New columns are automatically discovered; add display name here
+columns:
+  interface_protocol: "接口协议"
+  hardware_manual: "硬件手册"
+
 # Exclude from processing
 exclude:
   - Gemfile

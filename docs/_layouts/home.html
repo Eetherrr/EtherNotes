@@ -16,8 +16,9 @@
   {% include header.html %}
 
   <main class="home">
+
     <!-- ============================================================
-    HERO / PROFILE SECTION
+    HERO
     ============================================================ -->
     <section class="hero">
       <div class="hero-avatar">
@@ -26,21 +27,12 @@
         {% else %}
           <div class="hero-avatar-placeholder">
             {% assign initials = site.author.name | default: site.title | split: ' ' %}
-            {% assign first = initials[0] | slice: 0 %}
-            {% assign last = initials[-1] | slice: 0 %}
-            {{ first }}{{ last }}
+            {{ initials[0] | slice: 0 }}{{ initials[-1] | slice: 0 }}
           </div>
         {% endif %}
       </div>
-
-      <h1 class="hero-name">
-        {{ site.author.name | default: site.title }}<span class="cursor"></span>
-      </h1>
-
-      {% if site.author.bio %}
-      <p class="hero-bio">{{ site.author.bio }}</p>
-      {% endif %}
-
+      <h1 class="hero-name">{{ site.author.name | default: site.title }}<span class="cursor"></span></h1>
+      {% if site.author.bio %}<p class="hero-bio">{{ site.author.bio }}</p>{% endif %}
       <div class="hero-social">
         {% if site.github_username %}
         <a href="https://github.com/{{ site.github_username }}" target="_blank" rel="noopener">
@@ -58,103 +50,124 @@
     </section>
 
     <!-- ============================================================
-    CATEGORY FILTER TABS
+    COLUMNS & SERIES — grouped by _posts/ directory structure
     ============================================================ -->
-    {% assign all_categories = site.categories | sort %}
-    {% if all_categories.size > 0 %}
-    <nav class="category-tabs">
-      <button class="category-tab active" data-category="__all__">全部</button>
-      {% for cat in all_categories %}
-      <button class="category-tab" data-category="{{ cat[0] }}">{{ cat[0] }}</button>
-      {% endfor %}
-    </nav>
-    {% endif %}
 
-    <!-- ============================================================
-    POST CARD GRID
-    ============================================================ -->
-    <section class="post-grid">
-      {% assign has_posts = false %}
-      {% for post in site.posts %}
-        {% if post.title and post.url %}
-          {% assign has_posts = true %}
-          <article
-            class="post-card"
-            data-categories="{{ post.categories | join: ',' }}"
-            data-category="{{ post.categories | last }}"
-          >
-            <!-- Category badge -->
-            {% assign cat = post.categories | last %}
-            <div class="post-card-category">{{ cat }}</div>
+    {% comment %}
+    Step 1: collect unique column directories from all posts
+    {% endcomment %}
+    {% assign col_dirs_str = "" %}
+    {% for post in site.posts %}
+      {% assign parts = post.path | split: "/" %}
+      {% assign col_dir = parts[1] %}
+      {% unless col_dirs_str contains col_dir %}
+        {% assign col_dirs_str = col_dirs_str | append: col_dir | append: "|" %}
+      {% endunless %}
+    {% endfor %}
+    {% assign col_dirs = col_dirs_str | split: "|" %}
 
-            <!-- Title -->
-            <h2 class="post-card-title">
-              <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
-            </h2>
-
-            <!-- Meta: date + reading time -->
-            <div class="post-card-meta">
-              <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
-              <span class="post-card-reading-time">
-                {% assign word_count = post.content | number_of_words %}
-                {% assign read_time = word_count | divided_by: 300 | plus: 1 %}
-                ~{{ read_time }} 分钟阅读
-              </span>
-            </div>
-
-            <!-- Excerpt -->
-            {% if post.excerpt %}
-            <p class="post-card-excerpt">{{ post.excerpt | strip_html | truncate: 150 }}</p>
-            {% endif %}
-          </article>
+    {% if col_dirs.size > 0 %}
+    <!-- Quick-jump nav -->
+    <nav class="column-nav">
+      {% for col_dir in col_dirs %}
+        {% if col_dir != "" %}
+          {% assign col_name = site.columns[col_dir] | default: col_dir %}
+          <a href="#column-{{ col_dir | slugify }}" class="column-nav-link">{{ col_name }}</a>
         {% endif %}
       {% endfor %}
+    </nav>
 
-      {% unless has_posts %}
+    {% comment %}
+    Step 2: for each column, display posts grouped by series
+    {% endcomment %}
+    {% for col_dir in col_dirs %}
+      {% if col_dir == "" %}{% continue %}{% endif %}
+      {% assign col_name = site.columns[col_dir] | default: col_dir %}
+      {% assign col_slug = col_dir | slugify %}
+
+      <section id="column-{{ col_slug }}" class="column">
+        <h2 class="column-title">{{ col_name }}</h2>
+
+        {% comment %}
+        Step 3: within this column, group posts by series (second-level dir)
+        {% endcomment %}
+        {% assign series_dirs_str = "" %}
+        {% assign no_series_posts = "" %}
+
+        {% for post in site.posts %}
+          {% assign parts = post.path | split: "/" %}
+          {% assign p_col = parts[1] %}
+          {% if p_col != col_dir %}{% continue %}{% endif %}
+
+          {% comment %}Determine series: parts[2] is series dir if it exists and isn't the filename{% endcomment %}
+          {% assign depth = parts | size %}
+          {% if depth >= 4 %}
+            {% comment %}Has series subdir: _posts/col/series/file.md → depth=4{% endcomment %}
+            {% assign series_dir = parts[2] %}
+            {% unless series_dirs_str contains series_dir %}
+              {% assign series_dirs_str = series_dirs_str | append: series_dir | append: "|" %}
+            {% endunless %}
+          {% else %}
+            {% comment %}No series: _posts/col/file.md → depth=3{% endcomment %}
+            {% assign no_series_posts = no_series_posts | append: post.url | append: "|||" %}
+          {% endif %}
+        {% endfor %}
+
+        {% assign series_list = series_dirs_str | split: "|" %}
+
+        {% comment %}
+        Step 4: render each series group
+        {% endcomment %}
+        {% for series_dir in series_list %}
+          {% if series_dir == "" %}{% continue %}{% endif %}
+          {% assign series_name = series_dir | replace: "-", " " | replace: "_", " " %}
+          <div class="series">
+            <h3 class="series-title">{{ series_name }}</h3>
+            <div class="post-grid">
+              {% for post in site.posts %}
+                {% assign parts = post.path | split: "/" %}
+                {% assign p_col = parts[1] %}
+                {% assign p_series = parts[2] %}
+                {% if p_col != col_dir or p_series != series_dir %}{% continue %}{% endif %}
+                {% include post-card.html post=post %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endfor %}
+
+        {% comment %}
+        Step 5: posts without series (directly in column dir)
+        {% endcomment %}
+        {% assign no_series_arr = no_series_posts | split: "|||" %}
+        {% assign has_no_series = false %}
+        {% for u in no_series_arr %}{% if u != "" %}{% assign has_no_series = true %}{% break %}{% endif %}{% endfor %}
+
+        {% if has_no_series %}
+        <div class="post-grid">
+          {% for post in site.posts %}
+            {% assign parts = post.path | split: "/" %}
+            {% if parts[1] != col_dir %}{% continue %}{% endif %}
+            {% if parts.size >= 4 %}{% continue %}{% endif %}
+            {% include post-card.html post=post %}
+          {% endfor %}
+        </div>
+        {% endif %}
+      </section>
+    {% endfor %}
+    {% endif %}
+
+    {% comment %}Fallback: no posts at all{% endcomment %}
+    {% assign total_posts = site.posts | size %}
+    {% if total_posts == 0 %}
+    <section class="post-grid">
       <div class="post-grid-empty">
         <p>📝 还没有文章，开始写第一篇吧～</p>
       </div>
-      {% endunless %}
     </section>
+    {% endif %}
+
   </main>
 
   {% include footer.html %}
-
-  <!-- ============================================================
-  CATEGORY FILTER — Vanilla JS
-  ============================================================ -->
-  <script>
-  (function() {
-    var tabs = document.querySelectorAll('.category-tab');
-    var cards = document.querySelectorAll('.post-card');
-
-    if (!tabs.length || !cards.length) return;
-
-    tabs.forEach(function(tab) {
-      tab.addEventListener('click', function() {
-        var category = this.getAttribute('data-category');
-
-        // Toggle active class
-        tabs.forEach(function(t) { t.classList.remove('active'); });
-        this.classList.add('active');
-
-        // Show/hide cards
-        cards.forEach(function(card) {
-          if (category === '__all__') {
-            card.style.display = '';
-            return;
-          }
-          var cardCategories = card.getAttribute('data-categories') || '';
-          // Check if card belongs to this category
-          if (cardCategories.split(',').indexOf(category) !== -1) {
-            card.style.display = '';
-          } else {
-            card.style.display = 'none';
-          }
-        });
-      });
-    });
-  })();
-  </script>
 </body>
 </html>

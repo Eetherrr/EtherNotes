@@ -1,0 +1,23 @@
+<article class="post-card">
+  {% comment %}Category badge from front matter{% endcomment %}
+  {% assign cat = post.categories | last %}
+  {% if cat %}
+  <div class="post-card-category">{{ cat }}</div>
+  {% endif %}
+
+  <h3 class="post-card-title">
+    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+  </h3>
+
+  <div class="post-card-meta">
+    <time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y-%m-%d" }}</time>
+    <span class="post-card-reading-time">
+      {% assign word_count = post.content | number_of_words %}
+      ~{{ word_count | divided_by: 300 | plus: 1 }} 分钟阅读
+    </span>
+  </div>
+
+  {% if post.excerpt %}
+  <p class="post-card-excerpt">{{ post.excerpt | strip_html | truncate: 120 }}</p>
+  {% endif %}
+</article>
