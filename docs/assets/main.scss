@@ -624,6 +624,205 @@ img {
   font-family: var(--font-mono);
   font-size: 0.85rem;
   color: var(--text-muted);
+  margin-top: 8px;
+}
+
+.post-categories {
+  margin-left: 12px;
+}
+
+.post-category {
+  display: inline-block;
+  padding: 2px 10px;
+  margin: 0 2px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  color: var(--accent-blue);
+}
+
+/* ---- Post content typography ---- */
+.post-content h1,
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+  color: var(--text-primary);
+  margin-top: 2em;
+  margin-bottom: 0.6em;
+  line-height: 1.4;
+}
+
+.post-content h1 { font-size: 1.75rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4em; }
+.post-content h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; }
+.post-content h3 { font-size: 1.15rem; }
+.post-content h4 { font-size: 1.05rem; color: var(--text-secondary); }
+
+.post-content p {
+  margin: 0 0 1em;
+  line-height: 1.8;
+}
+
+.post-content a {
+  color: var(--accent-blue);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.post-content a:hover {
+  color: var(--accent-cyan);
+}
+
+/* Lists */
+.post-content ul,
+.post-content ol {
+  padding-left: 1.5em;
+  margin: 0 0 1em;
+}
+
+.post-content li {
+  margin-bottom: 0.35em;
+  line-height: 1.7;
+}
+
+.post-content li > ul,
+.post-content li > ol {
+  margin-top: 0.35em;
+  margin-bottom: 0;
+}
+
+/* Blockquote */
+.post-content blockquote {
+  border-left: 3px solid var(--accent-blue);
+  margin: 1.2em 0;
+  padding: 0.6em 1em;
+  background: rgba(56, 189, 248, 0.05);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  color: var(--text-secondary);
+}
+
+.post-content blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* Horizontal rule */
+.post-content hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 2em 0;
+}
+
+/* Tables */
+.post-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
+  font-size: 0.9rem;
+}
+
+.post-content th,
+.post-content td {
+  padding: 10px 14px;
+  border: 1px solid var(--border-subtle);
+  text-align: left;
+}
+
+.post-content th {
+  background: var(--bg-tertiary);
+  font-weight: 600;
+  color: var(--accent-blue);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.post-content tr:hover td {
+  background: rgba(56, 189, 248, 0.03);
+}
+
+/* Images in posts */
+.post-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  display: block;
+  margin: 1.2em auto;
+}
+
+/* Inline code */
+.post-content code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 2px 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  color: var(--accent-cyan);
+  border: 1px solid var(--border-subtle);
+}
+
+/* Code blocks (Rouge-highlighted or plain pre) */
+.post-content pre,
+.post-content div.highlight {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  margin: 1.2em 0;
+  overflow-x: auto;
+}
+
+.post-content pre {
+  padding: 16px 20px;
+  line-height: 1.6;
+}
+
+.post-content pre code {
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+.post-content div.highlight pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+/* WaveDrom rendered diagrams */
+.post-content .wavedrom,
+.post-content script[type="WaveDrom"] {
+  display: block;
+  margin: 1.2em auto;
+  overflow-x: auto;
+}
+
+.post-content .wavedrom svg {
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-subtle);
+  max-width: 100%;
+  height: auto;
+}
+
+/* Strong / emphasis */
+.post-content strong {
+  color: var(--text-primary);
+}
+
+.post-content em {
+  color: var(--text-secondary);
+}
+
+/* ---- WaveDrom rendered output ---- */
+.wavedrom svg {
+  background: #fff;
+  border-radius: var(--radius-md);
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
 }
 
 /* ============================================================

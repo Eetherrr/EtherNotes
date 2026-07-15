@@ -40,27 +40,29 @@
   {% include footer.html %}
 
   <!-- WaveDrom: render timing diagrams from ```wavedrom blocks -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.3.0/skin-default.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.3.0/wavedrom.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/skins/default.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/wavedrom.min.js"></script>
   <script>
-    window.addEventListener('DOMContentLoaded', function() {
+    (function() {
       if (typeof WaveDrom === 'undefined') return;
 
+      // Convert ```wavedrom code blocks to <script type="WaveDrom"> elements
       var blocks = document.querySelectorAll('.language-wavedrom');
       blocks.forEach(function(block) {
         try {
           var raw = block.textContent || block.innerText;
-          // WaveDrom uses JS object notation (unquoted keys), not strict JSON
-          var data = (new Function('return (' + raw + ')'))();
-          var container = document.createElement('div');
-          block.parentNode.replaceChild(container, block);
-          WaveDrom.renderWaveForm(0, data, container);
+          var script = document.createElement('script');
+          script.type = 'WaveDrom';
+          script.textContent = raw;
+          block.parentNode.replaceChild(script, block);
         } catch (e) {
-          // Parse/render error, leave code block as-is
-          console.warn('WaveDrom render error:', e);
+          console.warn('WaveDrom convert error:', e);
         }
       });
-    });
+
+      // Let WaveDrom process all <script type="WaveDrom"> elements
+      WaveDrom.processAll();
+    })();
   </script>
 </body>
 </html>
