@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'zh-CN' }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+  <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+  <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+  {% feed_meta %}
+  {% seo %}
+</head>
+<body>
+  {% include header.html %}
+
+  <main class="page-content" role="main">
+    <article class="post">
+      <header class="post-header">
+        <h1 class="post-title">{{ page.title }}</h1>
+        <div class="post-meta">
+          <time datetime="{{ page.date | date_to_xmlschema }}">{{ page.date | date: "%Y-%m-%d" }}</time>
+          {% if page.categories %}
+          <span class="post-categories">
+            {% for cat in page.categories %}
+            <span class="post-category">{{ cat }}</span>
+            {% endfor %}
+          </span>
+          {% endif %}
+        </div>
+      </header>
+
+      <div class="post-content">
+        {{ content }}
+      </div>
+    </article>
+  </main>
+
+  {% include footer.html %}
+
+  <!-- WaveDrom: render timing diagrams from ```wavedrom blocks -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.3.0/skin-default.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/3.3.0/wavedrom.min.js" defer></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      if (typeof WaveDrom === 'undefined') return;
+
+      var blocks = document.querySelectorAll('.language-wavedrom');
+      blocks.forEach(function(block) {
+        try {
+          var raw = block.textContent || block.innerText;
+          var data = JSON.parse(raw);
+          var container = document.createElement('div');
+          block.parentNode.parentNode.replaceChild(container, block.parentNode);
+          WaveDrom.renderWaveForm(0, data, container);
+        } catch (e) {
+          // Invalid JSON or render error, leave as code block
+          console.warn('WaveDrom parse/render error:', e);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
