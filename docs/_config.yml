@@ -22,7 +22,6 @@ plugins:
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
-  - jekyll-diagrams
 
 # Minima settings
 minima:

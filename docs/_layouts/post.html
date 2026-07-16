@@ -146,18 +146,17 @@
   <script>
     (function() {
       if (typeof WaveDrom === 'undefined') return;
-      var blocks = document.querySelectorAll('.language-wavedrom');
-      blocks.forEach(function(block) {
-        try {
-          var raw = block.textContent || block.innerText;
-          var script = document.createElement('script');
-          script.type = 'WaveDrom';
-          script.textContent = raw;
-          block.parentNode.replaceChild(script, block);
-        } catch (e) {
-          console.warn('WaveDrom convert error:', e);
-        }
+
+      // Convert ```wavedrom markdown code blocks to <script type="WaveDrom">
+      // so they work alongside native <script type="WaveDrom"> tags
+      document.querySelectorAll('.language-wavedrom').forEach(function(block) {
+        var script = document.createElement('script');
+        script.type = 'WaveDrom';
+        script.textContent = block.textContent.trim();
+        block.parentNode.replaceChild(script, block);
       });
+
+      // WaveDrom automatically finds <script type="WaveDrom"> and renders them
       WaveDrom.processAll();
     })();
   </script>
