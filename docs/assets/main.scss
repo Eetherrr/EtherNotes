@@ -643,6 +643,22 @@ img {
   margin: 0;
 }
 
+.footer-license {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+}
+
+.footer-license a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.footer-license a:hover {
+  color: var(--accent-cyan);
+}
+
 .footer-copyright .heart {
   color: var(--accent-rose);
 }
