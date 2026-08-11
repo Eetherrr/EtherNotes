@@ -666,6 +666,18 @@ img {
 /* ============================================================
    POST PAGE OVERRIDES (for individual post pages)
    ============================================================ */
+/* ---- Tables (global reset — minima's light defaults break dark theme) ---- */
+table {
+  color: var(--text-primary);
+  border-color: var(--border-subtle);
+}
+table tr:nth-child(even) {
+  background: none;
+}
+table tr:nth-child(even) td {
+  background: transparent;
+}
+
 .post-content,
 .page-content {
   max-width: 780px;
@@ -708,153 +720,140 @@ img {
   color: var(--accent-blue);
 }
 
-/* ---- Post content typography ---- */
-.post-content h1,
-.post-content h2,
-.post-content h3,
-.post-content h4 {
-  color: var(--text-primary);
-  margin-top: 2em;
-  margin-bottom: 0.6em;
-  line-height: 1.4;
-}
+/* ---- Post & Page content typography (shared dark theme) ---- */
+.post-content,
+.page-content {
 
-.post-content h1 { font-size: 1.75rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4em; }
-.post-content h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; }
-.post-content h3 { font-size: 1.15rem; }
-.post-content h4 { font-size: 1.05rem; color: var(--text-secondary); }
+  h1, h2, h3, h4 {
+    color: var(--text-primary);
+    margin-top: 2em;
+    margin-bottom: 0.6em;
+    line-height: 1.4;
+  }
+  h1 { font-size: 1.75rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.4em; }
+  h2 { font-size: 1.4rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.3em; }
+  h3 { font-size: 1.15rem; }
+  h4 { font-size: 1.05rem; color: var(--text-secondary); }
 
-.post-content p {
-  margin: 0 0 1em;
-  line-height: 1.8;
-}
+  p {
+    margin: 0 0 1em;
+    line-height: 1.8;
+  }
 
-.post-content a {
-  color: var(--accent-blue);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+  a {
+    color: var(--accent-blue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    &:hover { color: var(--accent-cyan); }
+  }
 
-.post-content a:hover {
-  color: var(--accent-cyan);
-}
+  /* Lists */
+  ul, ol {
+    padding-left: 1.5em;
+    margin: 0 0 1em;
+  }
+  li {
+    margin-bottom: 0.35em;
+    line-height: 1.7;
+  }
+  li > ul, li > ol {
+    margin-top: 0.35em;
+    margin-bottom: 0;
+  }
 
-/* Lists */
-.post-content ul,
-.post-content ol {
-  padding-left: 1.5em;
-  margin: 0 0 1em;
-}
+  /* Blockquote */
+  blockquote {
+    border-left: 3px solid var(--accent-blue);
+    margin: 1.2em 0;
+    padding: 0.6em 1em;
+    background: rgba(56, 189, 248, 0.05);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    color: var(--text-secondary);
+    p:last-child { margin-bottom: 0; }
+  }
 
-.post-content li {
-  margin-bottom: 0.35em;
-  line-height: 1.7;
-}
+  /* Horizontal rule */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border-subtle);
+    margin: 2em 0;
+  }
 
-.post-content li > ul,
-.post-content li > ol {
-  margin-top: 0.35em;
-  margin-bottom: 0;
-}
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1em 0;
+    font-size: 0.9rem;
+  }
+  th, td {
+    padding: 10px 14px;
+    border: 1px solid var(--border-subtle);
+    text-align: left;
+  }
+  th {
+    background: var(--bg-tertiary);
+    font-weight: 600;
+    color: var(--accent-blue);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  tr:hover td {
+    background: rgba(56, 189, 248, 0.03);
+  }
 
-/* Blockquote */
-.post-content blockquote {
-  border-left: 3px solid var(--accent-blue);
-  margin: 1.2em 0;
-  padding: 0.6em 1em;
-  background: rgba(56, 189, 248, 0.05);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  color: var(--text-secondary);
-}
+  /* Images */
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-subtle);
+    display: block;
+    margin: 1.2em auto;
+  }
 
-.post-content blockquote p:last-child {
-  margin-bottom: 0;
-}
+  /* Inline code */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    padding: 2px 6px;
+    background: var(--bg-tertiary);
+    border-radius: var(--radius-sm);
+    color: var(--accent-cyan);
+    border: 1px solid var(--border-subtle);
+  }
 
-/* Horizontal rule */
-.post-content hr {
-  border: none;
-  border-top: 1px solid var(--border-subtle);
-  margin: 2em 0;
-}
+  /* Code blocks */
+  pre,
+  div.highlight {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    margin: 1.2em 0;
+    overflow-x: auto;
+  }
+  pre {
+    padding: 16px 20px;
+    line-height: 1.6;
+  }
+  pre code {
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+  }
+  div.highlight pre {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
 
-/* Tables */
-.post-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1em 0;
-  font-size: 0.9rem;
-}
-
-.post-content th,
-.post-content td {
-  padding: 10px 14px;
-  border: 1px solid var(--border-subtle);
-  text-align: left;
-}
-
-.post-content th {
-  background: var(--bg-tertiary);
-  font-weight: 600;
-  color: var(--accent-blue);
-  font-family: var(--font-mono);
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.post-content tr:hover td {
-  background: rgba(56, 189, 248, 0.03);
-}
-
-/* Images in posts */
-.post-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-subtle);
-  display: block;
-  margin: 1.2em auto;
-}
-
-/* Inline code */
-.post-content code {
-  font-family: var(--font-mono);
-  font-size: 0.88em;
-  padding: 2px 6px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-sm);
-  color: var(--accent-cyan);
-  border: 1px solid var(--border-subtle);
-}
-
-/* Code blocks (Rouge-highlighted or plain pre) */
-.post-content pre,
-.post-content div.highlight {
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--radius-md);
-  margin: 1.2em 0;
-  overflow-x: auto;
-}
-
-.post-content pre {
-  padding: 16px 20px;
-  line-height: 1.6;
-}
-
-.post-content pre code {
-  padding: 0;
-  background: none;
-  border: none;
-  color: var(--text-primary);
-  font-size: 0.85rem;
-}
-
-.post-content div.highlight pre {
-  margin: 0;
-  border: none;
-  border-radius: 0;
+  /* Strong / emphasis */
+  strong { color: var(--text-primary); }
+  em { color: var(--text-secondary); }
 }
 
 /* WaveDrom rendered diagrams */
@@ -881,15 +880,6 @@ img {
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-md);
   background: var(--bg-tertiary);
-}
-
-/* Strong / emphasis */
-.post-content strong {
-  color: var(--text-primary);
-}
-
-.post-content em {
-  color: var(--text-secondary);
 }
 
 /* ============================================================
