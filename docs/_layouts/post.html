@@ -140,24 +140,30 @@
 
   {% include footer.html %}
 
-  <!-- WaveDrom -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/skins/default.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/wavedrom/2.6.8/wavedrom.min.js"></script>
+  <!-- WaveDrom: vendored locally (cdnjs is unreliable in CN), custom dark skin -->
+  <script src="{{ '/assets/js/wavedrom/skins/ether.js' | relative_url }}"></script>
+  <script src="{{ '/assets/js/wavedrom/wavedrom.min.js' | relative_url }}"></script>
   <script>
     (function() {
-      if (typeof WaveDrom === 'undefined') return;
+      // Convert each ```wavedrom code block into a rendered waveform.
+      // WaveDrom 2.6.8's ProcessAll only handles a single InputJSON_0 script,
+      // so we drive RenderWaveForm per-block instead.
+      if (typeof WaveDrom === 'undefined' || !WaveDrom.RenderWaveForm) return;
 
-      // Convert ```wavedrom markdown code blocks to <script type="WaveDrom">
-      // so they work alongside native <script type="WaveDrom"> tags
-      document.querySelectorAll('.language-wavedrom').forEach(function(block) {
-        var script = document.createElement('script');
-        script.type = 'WaveDrom';
-        script.textContent = block.textContent.trim();
-        block.parentNode.replaceChild(script, block);
+      document.querySelectorAll('code.language-wavedrom').forEach(function(block, i) {
+        var holder = block.closest('.highlight') || block.closest('pre') || block;
+        var container = document.createElement('div');
+        container.id = 'WaveDrom_Display_' + i;
+        container.className = 'wavedrom';
+        holder.parentNode.replaceChild(container, holder);
+        try {
+          var source = Function('return (' + block.textContent.trim() + ')')();
+          WaveDrom.RenderWaveForm(i, source, 'WaveDrom_Display_');
+        } catch (e) {
+          container.className = 'wavedrom-error';
+          container.textContent = '[WaveDrom] 波形图渲染失败: ' + e.message;
+        }
       });
-
-      // WaveDrom automatically finds <script type="WaveDrom"> and renders them
-      WaveDrom.processAll();
     })();
   </script>
 </body>
