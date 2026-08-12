@@ -35,7 +35,7 @@ minima:
 dir_names:
   hardware: "硬件区"
   software: "软件区"
-  protocol: "接口协议"
+  protocol: "协议"
   manual: "手册"
 
 # Exclude from processing
