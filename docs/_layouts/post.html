@@ -37,6 +37,8 @@
         {% assign series_posts = series_posts | push: p %}
       {% endif %}
     {% endfor %}
+    {% comment %}Sort by front-matter `order` field (Vol 1, Vol 2, ...){% endcomment %}
+    {% assign series_posts = series_posts | sort: "order" %}
   {% endif %}
 
   <div class="post-wrapper{% if has_series %} has-sidebar{% endif %}">

@@ -131,14 +131,20 @@
             {% for ser in series_list %}
               {% if ser == "" %}{% continue %}{% endif %}
               {% assign ser_name = ser | replace: "-", " " | replace: "_", " " %}
+              {% comment %}Collect series posts, then sort by front-matter `order`{% endcomment %}
+              {% assign ser_posts = "" | split: "" %}
+              {% for post in site.posts %}
+                {% assign parts = post.path | split: "/" %}
+                {% if parts[1] == col and parts[2] == sub and parts[3] == ser %}
+                  {% assign ser_posts = ser_posts | push: post %}
+                {% endif %}
+              {% endfor %}
+              {% assign ser_posts = ser_posts | sort: "order" %}
               <div class="series">
                 <h4 class="series-title">{{ ser_name }}</h4>
                 <div class="post-grid">
-                  {% for post in site.posts %}
-                    {% assign parts = post.path | split: "/" %}
-                    {% if parts[1] == col and parts[2] == sub and parts[3] == ser %}
-                      {% include post-card.html post=post %}
-                    {% endif %}
+                  {% for post in ser_posts %}
+                    {% include post-card.html post=post %}
                   {% endfor %}
                 </div>
               </div>
