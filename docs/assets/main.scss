@@ -882,6 +882,22 @@ table tr:nth-child(even) td {
   background: var(--bg-tertiary);
 }
 
+/* Mermaid diagrams */
+.post-content .mermaid {
+  display: flex;
+  justify-content: center;
+  margin: 1.2em 0;
+  overflow-x: auto;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 20px;
+}
+.post-content .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
 /* ============================================================
    ROUGE DARK SYNTAX THEME (overrides minima's light palette)
    ============================================================ */

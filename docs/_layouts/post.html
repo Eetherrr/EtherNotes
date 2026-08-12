@@ -166,5 +166,38 @@
       });
     })();
   </script>
+
+  <!-- Mermaid: state/flow diagrams via jsdelivr (accessible in CN) -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <script>
+    (function(){
+      if (typeof mermaid === 'undefined') return;
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'dark',
+        themeVariables: {
+          primaryColor: '#1a2332',
+          primaryTextColor: '#e2e8f0',
+          primaryBorderColor: '#334155',
+          lineColor: '#64748b',
+          secondaryColor: '#111827',
+          tertiaryColor: '#0a0e17',
+          textColor: '#e2e8f0',
+          edgeLabelBackground: '#111827',
+          fontSize: '14px'
+        }
+      });
+      document.querySelectorAll('code.language-mermaid').forEach(function(block){
+        var holder = block.closest('.highlight') || block.closest('pre') || block;
+        var container = document.createElement('div');
+        container.className = 'mermaid';
+        container.textContent = block.textContent.trim();
+        holder.parentNode.replaceChild(container, holder);
+      });
+      if (document.querySelector('.mermaid')) {
+        mermaid.run().catch(function(){});
+      }
+    })();
+  </script>
 </body>
 </html>
