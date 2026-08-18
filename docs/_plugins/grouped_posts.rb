@@ -35,20 +35,29 @@ module EtherNotes
       cols_meta = (site.data["columns"] || {})["columns"] || []
 
       # 2. 收集原始分组结构（保持配置 + 目录出现顺序）
+      # relative_path 形如 "_posts/<列>/<子列>/[<系列>/]<文件>"
+      # 去掉首段 "_posts" 与末段文件名，剩下的目录段即：列/子列/[系列]
       columns = {} # key => {name:, subs: {key => {name:, series: {key => [docs]}, direct: []}}, direct: []}
       posts.each do |doc|
-        segs = doc.relative_path.split("/") # ["_posts", col, sub, (series), file]
-        next if segs.size < 3
+        segs = doc.relative_path.split("/")
+        next if segs.size < 3 # 至少 "_posts/<列>/<文件>"
 
-        col = segs[1]
-        sub = segs[2]
-        series = segs[3]
+        dirs = segs[1..-2] # ["<列>", "<子列>", ("<系列>")?]
+        col = dirs[0]
+        sub = dirs[1]
+        series = dirs[2] # 第三层目录（若有）即系列；更深处（第四层及以后）归入该系列
 
         node = (columns[col] ||= { name: col, subs: {}, direct: [] })
 
-        if series.nil?
+        if sub.nil?
+          # 列下的直接文章：_posts/<列>/<文件>.md
           node[:direct] << doc
+        elsif series.nil?
+          # 子列下的直接文章：_posts/<列>/<子列>/<文件>.md
+          subnode = (node[:subs][sub] ||= { name: sub, series: {}, direct: [] })
+          subnode[:direct] << doc
         else
+          # 系列文章：_posts/<列>/<子列>/<系列>/<文件>.md（可能更深）
           subnode = (node[:subs][sub] ||= { name: sub, series: {}, direct: [] })
           (subnode[:series][series] ||= []).push(doc)
         end

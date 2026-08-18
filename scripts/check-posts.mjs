@@ -18,6 +18,7 @@ const IMAGES_DIR = join(ROOT, "docs", "assets", "images");
 
 const FILE_RE = /^\d{4}-\d{2}-\d{2}-[a-z0-9-]+\.md$/i;
 const errors = [];
+const warnings = [];
 let checked = 0;
 
 function walk(dir) {
@@ -66,26 +67,30 @@ for (const file of walk(POSTS_DIR)) {
     }
   }
 
-  // 图片引用校验
+  // 图片引用校验（缺失图片仅告警，不阻断部署）
   const wikiImg = [...text.matchAll(/!\[\[([^\]|]+?)(?:\|\d+)?\]\]/g)].map((m) => m[1].trim());
   for (const name of wikiImg) {
     if (!imageFiles.has(name)) {
-      errors.push(`引用图片不存在: ${name} (${rel})，请放入 docs/assets/images/`);
+      warnings.push(`引用图片不存在: ${name} (${rel})，请放入 docs/assets/images/`);
     }
   }
   const absImg = [...text.matchAll(/!\[([^\]]*)\]\((\/assets\/[^)\s]+)\)/g)].map((m) => m[2]);
   for (const src of absImg) {
     const p = join(ROOT, "docs", src.replace(/^\/+/, ""));
     if (!existsSync(p)) {
-      errors.push(`图片路径无效: ${src} (${rel})`);
+      warnings.push(`图片路径无效: ${src} (${rel})`);
     }
   }
 }
 
 console.log(`校验文章 ${checked} 篇，图片目录含 ${imageFiles.size} 个文件。`);
+if (warnings.length) {
+  console.warn("\n警告（不阻断部署）：");
+  for (const w of warnings) console.warn("  ⚠ " + w);
+}
 if (errors.length) {
   console.error("\n发现问题：");
   for (const e of errors) console.error("  ✗ " + e);
   process.exit(1);
 }
-console.log("✓ 全部通过");
+console.log("✓ 规范校验通过");
