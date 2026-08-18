@@ -1,0 +1,173 @@
+---
+time: 2026-08-17T19:09:00
+tags:
+  - fpga
+  - hardware
+  - memory
+  - sdram
+order: 2
+---
+# SDRAM 工作流程
+
+## 上电初始化
+
+上电后必须先执行初始化序列，否则器件无法正常工作：
+
+```
+步骤1: VDD 与 VDDQ 同时上电，同时启动时钟
+步骤2: 等待至少 200us
+步骤3: 发送 PRECHARGE ALL（预充电所有 Bank）
+步骤4: 连续执行 8 次以上 AUTO REFRESH
+步骤5: 执行 MRS，编程 CAS Latency、突发长度等
+步骤6: 初始化完成，进入正常操作
+```
+
+## 状态机概览
+
+SDRAM 的内部操作由状态机控制。从冷启动到正常工作，再到各种运行状态的转换关系如下：
+
+```mermaid
+stateDiagram-v2
+    [*] --> PWR_UP : 上电 (VDD+VDDQ+CLK)
+    PWR_UP --> PRE_ALL : 等待 >200µs
+    PRE_ALL --> AR_CYCLE : PRECHARGE ALL
+    AR_CYCLE --> MRS_INIT : 8次 AUTO REFRESH
+    MRS_INIT --> IDLE : Mode Register Set
+
+    IDLE --> ROW_ACTIVE : ACT (行激活)
+    IDLE --> REFRESH : AUTO REFRESH
+    IDLE --> MODE_REG : MRS (重配置)
+
+    ROW_ACTIVE --> READ : READ
+    ROW_ACTIVE --> WRITE : WRITE
+
+    READ --> IDLE : READ with AP (A10=H)
+    READ --> PRECHARGING : PRE / BURST STOP+PRE
+
+    WRITE --> IDLE : WRITE with AP (A10=H)
+    WRITE --> PRECHARGING : PRE (tDPL后)
+
+    PRECHARGING --> IDLE : tRP 超时
+
+    REFRESH --> IDLE : tRC 超时
+    MODE_REG --> IDLE : tMRD 超时
+
+    IDLE --> PWR_DOWN : CKE=Low + NOP
+    PWR_DOWN --> IDLE : CKE=High + NOP
+
+    IDLE --> SELF_REFRESH : CKE=Low + AR
+    SELF_REFRESH --> IDLE : CKE=High + NOP
+```
+状态时序图
+```wavedrom
+{
+    signal: [
+        { name: "CLK", 
+         	wave: "n.|....|.....|.........." },
+      	{ name: "cnt_xx", 
+         	wave: "x8|8.8.|8.88.|8.......", 
+         	data:[">200us","20ns","70ns+7.8us(8)","2clk","cnt=0","50ns"] },
+		{ name: "cmd", 
+         	wave: "x4|4444|44444|4...", 
+         	data:["NOP","4'b0010","NOP","4'b0001","NOP","4'b0001","NOP","NOP","4'b0011","NOP"] },
+      	{ name: "state", 
+         	wave: "x3|3.3..3.33..3...", 
+         	data:["PWAIT","PRCALL","AREF(8)","MRS","IDLE","ACT"] }
+    ],
+  	config: { hscale: 2 }
+}
+```
+
+各状态简要说明：
+
+- **PWR_UP → PRE_ALL → AR_CYCLE → MRS_INIT**：上电初始化链，必须严格执行，不可跳过任一阶段
+- **IDLE**：所有 Bank 空闲，可接收 ACT / MRS / AUTO REFRESH 命令
+- **ROW_ACTIVE**：指定 Bank 的一行已激活，行数据锁存于 SA 中（tRCD 后），此时可发 READ/WRITE
+- **READ / WRITE**：突发读/写进行中，支持连续命令；A10=H 时突发结束后**自动预充电**回到 IDLE
+- **PRECHARGING**：预充电中（tRP），关闭激活行、SA 数据回写阵列、位线均衡到 VDD/2
+- **REFRESH**：自动刷新中（tRC），内部计数器产生行地址，无需外部提供
+- **MODE_REG**：模式寄存器设置中（tMRD），编程 CL/BL/突发类型
+- **PWR_DOWN**：时钟使能（CKE）拉低进入掉电，输入缓冲关闭以省电
+- **SELF_REFRESH**：CKE 拉低进入自刷新，内部定时器异步自动刷新，保持数据不掉
+
+## 读操作（时序）
+
+以 CL=2、BL=4 为例：
+
+1. **ACT**：发出 Bank 地址 + 行地址 → 指定行被激活，行数据载入 SA（耗时 tRCD）
+2. **等待 tRCD**（至少 2~3 个时钟周期）
+3. **READ**：发出 Bank 地址 + 起始列地址（A10=H 启用自动预充电）
+4. **等待 CL**：读命令后经过 CL 个时钟周期，数据在 DQ 线上连续输出
+5. **突发结束**：DQ 自动回到高阻态；若启用自动预充电，Bank 自动关闭回 IDLE
+6. 若未启用自预充电 → 手动发 PRE 命令关闭行（等 tRP 后可重新 ACT）
+
+> 读数据延迟（CL）由 SDRAM 内部流水线决定——数据在 SA 中已经就绪，CL 只是内部同步输出所需的管道延迟。
+
+```wavedrom
+{ signal: [
+  { name: "CLK", wave: "p...................." },
+  { name: "CMD", wave: "4.4.4.4.4.4.4.4.4.4", data: ["ACT","NOP","NOP","READ","NOP","NOP","NOP","NOP","NOP","NOP"] },
+  { name: "DQ",  wave: "8.8.8.8.8.8.4.4.4.4", data: ["","","","","","","D0","D1","D2","D3"] }
+]}
+```
+
+*CL=2、BL=4：ACT 后经 tRCD=3clk 等待再发 READ，CL 延迟后 DQ 输出 4 拍数据*
+
+## 写操作（时序）
+
+以 BL=4 为例：
+
+1. **ACT**：激活目标 Bank 与行（同读）
+2. **等待 tRCD**
+3. **WRITE**：发出 Bank 地址 + 起始列地址；**数据与写命令同拍送入**（写延迟 = 0）
+4. 后续数据每时钟沿送入，长度由 BL 决定
+5. 最后数据后需满足 **tDPL**（数据入到预充电 ≥ 2 时钟），再发 PRE 关闭行
+
+```wavedrom
+{ signal: [
+  { name: "CLK", wave: "p................." },
+  { name: "CMD", wave: "4.4.4.4.4.4.4.4.4", data: ["ACT","NOP","NOP","WRITE","NOP","NOP","NOP","NOP","PRE"] },
+  { name: "DQ",  wave: "8.8.8.8.4.4.4.4.8", data: ["","","","D0","D1","D2","D3","",""] }
+]}
+```
+
+*BL=4：数据与 WRITE 命令同拍开始，PRE 在最后数据后 2 时钟（tDPL=2）*
+
+## 预充电（Precharge）
+
+预充电的作用是**关闭当前激活的行**，为激活下一行做准备：
+
+1. 发出 PRE 命令（A10=H = 预充电所有 Bank，A10=L 配合 BA 选指定 Bank）
+2. 灵敏放大器中的数据被写回阵列（回写）
+3. 位线被均衡到 VDD/2（准备下次读取）
+4. 等待 **tRP**（预充电时间）后，Bank 回到 IDLE
+
+> **为什么不能直接跨行访问？** —— SA 中暂存的是当前行的数据，换行必须先写回旧行再加载新行。这就是 PRE → ACT 的必要性。
+
+## 刷新（Refresh）
+
+由于电容漏电，所有行必须在 **64ms** 内各刷新一次。对于 8192 行的 SDRAM：
+
+- 平均每隔 **64ms / 8192 = 约 7.8us** 执行一次 AUTO REFRESH
+- 每次 AR 刷新一行，行地址由**内部刷新计数器**自动产生（外部无需提供地址）
+- AR 命令要求所有 Bank 处于 IDLE 状态（先 PRE ALL）
+- AR 执行期间内部发生：行激活 → 灵敏放大器锁存 → 回写（等效于一次"读后写回"）
+- 一次 AR 耗时约 tRC（60~63ns）
+
+**自刷新（Self Refresh）**：低功耗模式下，CKE 拉低进入自刷新，内部定时器自动周期刷新。退出后建议补发一次 AR。
+
+## Bank 交错读写示例
+
+利用 4 个 Bank 流水线化访问，隐藏预充电延迟：
+
+```
+时间 →   T0   T1   T2   T3   T4   T5   T6   T7   T8
+Bank A:  ACT  RD   RD   PRE  -    -    ACT  RD   ...
+Bank B:  -    ACT  -    RD   PRE  -    -    -    ...
+Bank C:  -    -    ACT  -    -    RD   PRE  -    ...
+Bank D:  -    -    -    -    ACT  -    -    RD   ...
+DQ Bus:  -    -    D0A  D1A  D0B  D0C  D1C  D0D  ...
+```
+
+- 每 Bank 保持一行激活，读完后预充电
+- 当一个 Bank 在预充电（tRP）时，另一个 Bank 在传数据——总线无空闲

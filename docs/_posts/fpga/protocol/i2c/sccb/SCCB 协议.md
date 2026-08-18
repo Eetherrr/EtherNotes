@@ -1,0 +1,7 @@
+# SCCB与I2C区别
+
+## 数据传输
+
+- SCCB只支持**单字节**读写
+
+- 基本传输单元为相（phase），一个相有9个bit，前8bit为数据，最后一位是ACK，0代表Dont Care，1代表NACK
