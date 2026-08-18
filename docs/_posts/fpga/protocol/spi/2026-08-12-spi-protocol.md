@@ -1,4 +1,10 @@
-
+---
+layout: post
+title: SPI 协议层
+date: 2026-08-12
+categories: [fpga, protocol, spi]
+order: 2
+---
 
 # SPI 协议层详解
 
@@ -13,4 +19,3 @@
 - 模式 2：CPOL = 1，CPHA = 0；sclk 下降沿采样，sclk 上升沿发送
 - 模式 3：CPOL = 1，CPHA = 1；sclk 下降沿发送，sclk 上升沿采样
 ## 数据传输时序
-

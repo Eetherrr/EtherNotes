@@ -50,119 +50,56 @@
     </section>
 
     <!-- ============================================================
-    MAIN CONTENT — Columns → Sub-columns → Series
+    MAIN CONTENT — 由 _plugins/grouped_posts.rb 生成 site.data.grouped_posts
     ============================================================ -->
 
     {% if site.posts.size == 0 %}
     <section class="post-grid"><div class="post-grid-empty"><p>📝 还没有文章～</p></div></section>
     {% else %}
 
-    {% comment %}
-    Step 1: collect unique columns (parts[1])
-    {% endcomment %}
-    {% assign cols_str = "" %}
-    {% for post in site.posts %}
-      {% assign parts = post.path | split: "/" %}
-      {% assign c = parts[1] %}
-      {% unless cols_str contains c %}{% assign cols_str = cols_str | append: c | append: "|" %}{% endunless %}
-    {% endfor %}
-    {% assign columns = cols_str | split: "|" %}
-
     <!-- Quick-jump nav -->
     <nav class="column-nav">
-      {% for col in columns %}
-        {% if col != "" %}
-          {% assign col_name = site.dir_names[col] | default: col %}
-          <a href="#col-{{ col | slugify }}" class="column-nav-link">{{ col_name }}</a>
-        {% endif %}
+      {% for col in site.data.grouped_posts %}
+        <a href="#col-{{ col.key | slugify }}" class="column-nav-link">{{ col.name }}</a>
       {% endfor %}
     </nav>
 
-    {% comment %}
-    Step 2: for each column → sub-columns → series
-    {% endcomment %}
-    {% for col in columns %}
-      {% if col == "" %}{% continue %}{% endif %}
-      {% assign col_name = site.dir_names[col] | default: col %}
+    {% for col in site.data.grouped_posts %}
+      <section id="col-{{ col.key | slugify }}" class="column">
+        <h2 class="column-title">{{ col.name }}</h2>
 
-      <section id="col-{{ col | slugify }}" class="column">
-        <h2 class="column-title">{{ col_name }}</h2>
-
-        {% comment %}Collect sub-columns for this column{% endcomment %}
-        {% assign subs_str = "" %}
-        {% for post in site.posts %}
-          {% assign parts = post.path | split: "/" %}
-          {% if parts[1] != col %}{% continue %}{% endif %}
-          {% assign sub = parts[2] %}
-          {% if sub and sub != "" %}
-            {% unless subs_str contains sub %}{% assign subs_str = subs_str | append: sub | append: "|" %}{% endunless %}
-          {% endif %}
-        {% endfor %}
-        {% assign subcols = subs_str | split: "|" %}
-
-        {% comment %}Render each sub-column{% endcomment %}
-        {% for sub in subcols %}
-          {% if sub == "" %}{% continue %}{% endif %}
-          {% assign sub_name = site.dir_names[sub] | default: sub | replace: "-", " " | replace: "_", " " %}
-          {% assign sub_slug = sub | slugify %}
-
+        {% for sub in col.subcolumns %}
           <div class="subcolumn">
-            <h3 class="subcolumn-title">{{ sub_name }}</h3>
+            <h3 class="subcolumn-title">{{ sub.name }}</h3>
 
-            {% comment %}Collect series within this sub-column{% endcomment %}
-            {% assign series_str = "" %}
-            {% assign direct_posts = false %}
-            {% for post in site.posts %}
-              {% assign parts = post.path | split: "/" %}
-              {% if parts[1] != col or parts[2] != sub %}{% continue %}{% endif %}
-              {% assign depth = parts | size %}
-              {% if depth >= 5 %}
-                {% comment %}Has series: _posts/col/sub/series/file.md{% endcomment %}
-                {% assign ser = parts[3] %}
-                {% unless series_str contains ser %}{% assign series_str = series_str | append: ser | append: "|" %}{% endunless %}
-              {% else %}
-                {% comment %}No series: _posts/col/sub/file.md{% endcomment %}
-                {% assign direct_posts = true %}
-              {% endif %}
-            {% endfor %}
-            {% assign series_list = series_str | split: "|" %}
-
-            {% comment %}Posts with series{% endcomment %}
-            {% for ser in series_list %}
-              {% if ser == "" %}{% continue %}{% endif %}
-              {% assign ser_name = ser | replace: "-", " " | replace: "_", " " %}
-              {% comment %}Collect series posts, then sort by front-matter `order`{% endcomment %}
-              {% assign ser_posts = "" | split: "" %}
-              {% for post in site.posts %}
-                {% assign parts = post.path | split: "/" %}
-                {% if parts[1] == col and parts[2] == sub and parts[3] == ser %}
-                  {% assign ser_posts = ser_posts | push: post %}
-                {% endif %}
-              {% endfor %}
-              {% assign ser_posts = ser_posts | sort: "order" %}
-              <div class="series">
-                <h4 class="series-title">{{ ser_name }}</h4>
-                <div class="post-grid">
-                  {% for post in ser_posts %}
-                    {% include post-card.html post=post %}
-                  {% endfor %}
-                </div>
-              </div>
-            {% endfor %}
-
-            {% comment %}Posts without series (directly under sub-column){% endcomment %}
-            {% if direct_posts %}
-            <div class="post-grid">
-              {% for post in site.posts %}
-                {% assign parts = post.path | split: "/" %}
-                {% if parts[1] == col and parts[2] == sub and parts.size < 5 %}
+            {% for ser in sub.series %}
+            <div class="series">
+              <h4 class="series-title">{{ ser.name }}</h4>
+              <div class="post-grid">
+                {% for post in ser.posts %}
                   {% include post-card.html post=post %}
-                {% endif %}
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+
+            {% if sub.direct_posts.size > 0 %}
+            <div class="post-grid">
+              {% for post in sub.direct_posts %}
+                {% include post-card.html post=post %}
               {% endfor %}
             </div>
             {% endif %}
           </div>
         {% endfor %}
+
+        {% if col.direct_posts.size > 0 %}
+        <div class="post-grid">
+          {% for post in col.direct_posts %}
+            {% include post-card.html post=post %}
+          {% endfor %}
+        </div>
+        {% endif %}
       </section>
     {% endfor %}
     {% endif %}

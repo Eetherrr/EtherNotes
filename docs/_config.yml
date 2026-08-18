@@ -17,7 +17,19 @@ author:
 github_username: Eetherrr
 qq_number: "941288046"  # 填入你的 QQ 号
 
-# Build settings
+# 文章 URL 格式：/fpga/protocol/i2c/i2c-physical/
+# categories 由写作规范固定为目录路径（列/子列/[系列]）
+permalink: /:categories/:title/
+
+# 默认值：所有文章统一使用 post 布局（单人写作仍建议每篇文章显式声明 layout）
+defaults:
+  - scope:
+      path: ""
+      type: posts
+    values:
+      layout: post
+
+# Build plugins
 plugins:
   - jekyll-seo-tag
   - jekyll-feed
@@ -30,15 +42,10 @@ minima:
     - platform: github
       user_url: "https://github.com/Eetherrr"
 
-# Display name mapping for directories (any depth under _posts/)
-# New directories are auto-discovered; add display names here
-dir_names:
-  hardware: "硬件区"
-  software: "软件区"
-  protocol: "协议"
-  manual: "手册"
-
-# Exclude from processing
+# Exclude from processing (静态/工具文件、待办、本地依赖)
 exclude:
   - Gemfile
   - Gemfile.lock
+  - TODO.md
+  - vendor
+  - .obsidian

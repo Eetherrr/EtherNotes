@@ -1,12 +1,12 @@
 ---
-time: 2026-08-17T19:07:00
-tags:
-  - fpga
-  - hardware
-  - "#sdram"
-  - "#memory"
+layout: post
+title: SDRAM 概览
+date: 2026-08-17
+categories: [fpga, hardware, sdram]
 order: 0
+tags: [fpga, sdram, memory]
 ---
+
 # FPGA上的存储资源
 
 ## ROM

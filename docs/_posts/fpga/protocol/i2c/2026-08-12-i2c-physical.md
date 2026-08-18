@@ -1,6 +1,11 @@
 ---
+layout: post
+title: I2C 物理层
+date: 2026-08-12
+categories: [fpga, protocol, i2c]
 order: 1
 ---
+
 - 原理图
 
 ![[i2c_1.png|475]]

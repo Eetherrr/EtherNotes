@@ -1,3 +1,11 @@
+---
+layout: post
+title: SPI 概览
+date: 2026-08-12
+categories: [fpga, protocol, spi]
+order: 0
+---
+
 # 介绍
 
 - SPI（Serial Peripheral Interface，串行外围设备接口）是一种高速、全双工的同步串行通信协议
@@ -27,4 +35,4 @@
 - **MISO(Master Input，Slave Output)**：主设备输入/从设备输出引脚。主机从这条信号线读入数据，从机的数据由这条信号线输出到主机，数据方向由从机到主机
 - **CS(Chip Select)**：片选信号线，一般低电平有效。
 ## SPI 一主多从连接图
-![SPI_1](https://eetherrr.github.io/EtherNotes/assets/images/spi_1.png)
+![[spi_1.png]]

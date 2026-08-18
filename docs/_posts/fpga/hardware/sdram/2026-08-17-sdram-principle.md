@@ -1,12 +1,12 @@
 ---
-time: 2026-08-17T19:09:00
-tags:
-  - fpga
-  - hardware
-  - memory
-  - sdram
+layout: post
+title: SDRAM 工作原理
+date: 2026-08-17
+categories: [fpga, hardware, sdram]
 order: 1
+tags: [fpga, sdram, memory]
 ---
+
 # 存储单元原理
 
 ## 1T1C 基础存储单元
@@ -53,7 +53,7 @@ SDRAM 的最小存储单元由一个晶体管（MOSFET）和一个电容组成�
 - 具有低输出阻抗，输入电阻极高
 - 理论上具有无穷大扇出，单个反相器可以驱动无穷多个门，增加扇出[^2]会增加传播延时，动态特性会变差，但不影响稳态特性
 - 在稳态工作情况下，电源线和地线之间没有直接通路，没有电流存在，理论上没有静态功耗
-![CMOS反相器|378](../../assets/image/sa.dio.png)
+![[sa.dio.png|378]]
 - PMOS用于导通VDD，NMOS用于导通GND
 灵敏放大器就是两个反相器互相耦合
 

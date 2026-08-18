@@ -1,0 +1,16 @@
+# 分类树配置：列 → 子列 的显示名与顺序。
+# 约定：docs/_posts/<列>/<子列>/[<系列>/]<日期>-<slug>.md
+#   - 列/子列 未在此列出的会自动发现（显示名 = 目录名下划线转空格），并追加到末尾
+#   - 系列 的显示名恒为所在目录名（下划线转空格）
+columns:
+  - key: fpga
+    name: FPGA 数字设计
+    subcolumns:
+      - key: protocol
+        name: 接口协议
+      - key: hardware
+        name: 硬件设计
+      - key: manual
+        name: 芯片手册
+      - key: misc
+        name: 杂项

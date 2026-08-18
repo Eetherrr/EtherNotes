@@ -1,10 +1,10 @@
 source "https://rubygems.org"
 
-gem "minima"
 gem "jekyll", "~> 4.3"
-gem "jekyll-seo-tag"
-gem "jekyll-feed"
-gem "jekyll-sitemap"
+gem "minima"
+
+# 本地 `jekyll serve` 需要（Ruby 3.0+ 不再内置 webrick）
+gem "webrick"
 
 group :jekyll_plugins do
   gem "jekyll-seo-tag"

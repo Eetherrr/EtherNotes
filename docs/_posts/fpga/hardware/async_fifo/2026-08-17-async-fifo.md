@@ -1,11 +1,9 @@
 ---
-time: 2026-08-17T08:40:00
-tags:
-  - "#fpga"
-  - "#fifo"
-  - "#hardware"
-  - memory
-  - "#async"
+layout: post
+title: Asynchronous FIFO
+date: 2026-08-17
+categories: [fpga, hardware, async_fifo]
+tags: [fpga, fifo, hardware, async]
 ---
 
 # 设计结构

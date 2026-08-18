@@ -1,12 +1,12 @@
 ---
-time: 2026-08-17T19:09:00
-tags:
-  - fpga
-  - hardware
-  - memory
-  - sdram
+layout: post
+title: SDRAM 工作流程
+date: 2026-08-17
+categories: [fpga, hardware, sdram]
 order: 2
+tags: [fpga, sdram, memory]
 ---
+
 # SDRAM 工作流程
 
 ## 上电初始化

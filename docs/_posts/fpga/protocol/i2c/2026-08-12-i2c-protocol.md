@@ -1,6 +1,11 @@
 ---
+layout: post
+title: I2C 协议层
+date: 2026-08-12
+categories: [fpga, protocol, i2c]
 order: 0
 ---
+
 - 时序
 ```wavedrom
 {
@@ -75,4 +80,3 @@ I2C顺序读操作就是对寄存器或存储单元数据的顺序读取。假�
 - 顺序读操作，2字节地址
 
     <-待补充->
-
