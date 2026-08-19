@@ -31,9 +31,11 @@ module EtherNotes
 
       post_map = {}
       site.posts.docs.each do |doc|
-        post_map[doc.basename] = doc.url
+        # doc.url 不含 baseurl（部署在项目子路径时需手动拼上）
+        url = site.baseurl.to_s + doc.url
+        post_map[doc.basename] = url
         title = doc.data["title"]
-        post_map[title] = doc.url if title
+        post_map[title] = url if title
       end
 
       asset_map = {}
