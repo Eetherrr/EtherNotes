@@ -3,8 +3,9 @@
     "aliases": "aliases",
     "cssclasses": "multitext",
     "tags": "tags",
-    "time": "datetime",
+    "time": "date",
     "order": "number",
-    "title": "text"
+    "title": "text",
+    "date": "date"
   }
 }

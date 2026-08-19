@@ -11,10 +11,14 @@
             "id": "8c22c9e7b5cb532e",
             "type": "leaf",
             "state": {
-              "type": "empty",
-              "state": {},
+              "type": "markdown",
+              "state": {
+                "file": "docs/_posts/fpga/misc/2026-08-17-metastability.md",
+                "mode": "source",
+                "source": false
+              },
               "icon": "lucide-file",
-              "title": "新标签页"
+              "title": "2026-08-17-metastability"
             }
           }
         ]
@@ -195,8 +199,14 @@
       "obsidian-git:Open Git source control": false
     }
   },
-  "active": "f924ba1fe0e82400",
+  "active": "73f96ca8ae9521eb",
   "lastOpenFiles": [
+    "docs/_posts/fpga/misc/2026-08-18-cdc.md",
+    "docs/_posts/fpga/misc/2026-08-17-metastability.md",
+    "docs/_posts/fpga/misc/2026-08-19-ram.md",
+    "docs/_posts/fpga/manual/sensor/2026-08-14-ov5640.md",
+    "docs/_posts/fpga/manual/sensor/2026-08-12-ds18b20.md",
+    "docs/_posts/fpga/manual/sdram/2026-08-14-h57v561620ftp.md",
     "docs/assets/images/spi_1.png",
     "docs/assets/images/sdram_3.png",
     "docs/assets/images/sdram_2.png",
@@ -208,7 +218,6 @@
     "docs/assets/image/spi_1.png",
     "docs/assets/image/sdram_3.png",
     "docs/assets/image/sa.dio.png",
-    "docs/assets/image/sdram_1.png",
     "docs/assets/image",
     "docs/_posts/fpga/assets/image",
     "docs/_posts/fpga/assets",
@@ -238,11 +247,6 @@
     "fpga/manual/sensor/DS18B20.md",
     "fpga/hardware/sdram/SDRAM 概览.md",
     "fpga/hardware/sdram/SDRAM 工作流程.md",
-    "fpga/hardware/sdram/SDRAM 工作原理.md",
-    "fpga/hardware/async_fifo/Asynchronous FIFO.md",
-    "protocol/i2c/I2C 物理层.md",
-    "protocol/i2c/I2C 协议层.md",
-    "protocol/i2c/I2C 实现.md",
     "未命名.canvas"
   ]
 }
