@@ -6,6 +6,8 @@
 
 由 [GitHub Pages] + [Jekyll] 构建，使用 [Obsidian] 作为本地写作工具，推送到 `main` 分支后由 GitHub Actions 自动构建部署。
 
+🎨 **主题**：8-bit 像素风，字体为 [Fusion Pixel 缝合像素字体](https://github.com/TakWolf/fusion-pixel-font)（OFL 1.1 许可，见 `docs/assets/fonts/OFL.txt`），本地加载无 CDN 依赖。
+
 [GitHub Pages]: https://pages.github.com/
 [Jekyll]: https://jekyllrb.com/
 [Obsidian]: https://obsidian.md/
@@ -28,7 +30,7 @@ EtherNotes/                        ← Obsidian 库根目录
 │   │   ├── grouped_posts.rb        # 目录树 → 列/子列/系列 分组
 │   │   └── wikilinks.rb            # Obsidian 语法 → 标准 Markdown/HTML
 │   ├── _layouts/ _includes/        # 布局与局部模板
-│   ├── assets/                     # main.scss、images/、js/wavedrom/
+│   ├── assets/                     # main.scss、fonts/（像素字体）、images/、js/wavedrom/
 │   ├── _posts/                     # 文章（见下方约定）
 │   ├── about.md / index.html
 │   └── TODO.md                     # 个人待办（不参与构建）
@@ -113,3 +115,4 @@ node scripts/check-posts.mjs
 | ----------------- | ---------------------------- | --------------------------- |
 | 📄 **文档 & 文章** | [CC BY-SA 4.0](LICENSE-DOCS) | `docs/_posts/` 下的文章内容 |
 | 💻 **源码**        | [MIT](LICENSE-CODE)          | Jekyll 模板、CSS、JS 等代码 |
+| 🔤 **字体**        | [OFL 1.1](docs/assets/fonts/OFL.txt) | Fusion Pixel 缝合像素字体（可商用，须随字体保留许可文本） |
