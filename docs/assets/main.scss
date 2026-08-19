@@ -5,14 +5,16 @@
 
 /* ============================================================
    EtherNotes — 8-Bit Pixel 主题
-   字体: Fusion Pixel (缝合像素字体, OFL 1.1 可商用)
+   字体: Fusion Pixel 缝合像素字体（OFL 1.1）+ 柔和黑体兜底，绝不回退宋体楷体
    设计: 方块像素边框 / 硬阴影 / 扫描线 / 无圆角
    ============================================================ */
 
+
 /* ---- Pixel Fonts (vendored, OFL 1.1) ---- */
+/* 注意: url 相对编译后的 assets/main.css，故为 fonts/ 而非 ../fonts/ */
 @font-face {
   font-family: "Fusion Pixel";
-  src: url("../fonts/fusion-pixel-12px-proportional-latin.otf.woff2") format("woff2");
+  src: url("fonts/fusion-pixel-12px-proportional-latin.otf.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -23,7 +25,7 @@
 
 @font-face {
   font-family: "Fusion Pixel";
-  src: url("../fonts/fusion-pixel-12px-proportional-zh_hans.otf.woff2") format("woff2");
+  src: url("fonts/fusion-pixel-12px-proportional-zh_hans.otf.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -32,18 +34,18 @@
 
 @font-face {
   font-family: "Fusion Pixel Mono";
-  src: url("../fonts/fusion-pixel-12px-monospaced-latin.otf.woff2") format("woff2");
+  src: url("fonts/fusion-pixel-12px-monospaced-latin.otf.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6,
     U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193,
-    U+2212, U+2215, U+FEFF, U+FFFD;
+    U+2212, U+2215, U+2000-206F, U+FEFF, U+FFFD;
 }
 
 @font-face {
   font-family: "Fusion Pixel Mono";
-  src: url("../fonts/fusion-pixel-12px-monospaced-zh_hans.otf.woff2") format("woff2");
+  src: url("fonts/fusion-pixel-12px-monospaced-zh_hans.otf.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -88,8 +90,8 @@
   --shadow-strong: 0 6px 0 0 #000;
 
   /* Typography — 像素字体，全站中文也像素 */
-  --font-mono: "Fusion Pixel Mono", "Fusion Pixel", monospace;
-  --font-sans: "Fusion Pixel", "Fusion Pixel Mono", monospace;
+  --font-mono: "Fusion Pixel Mono", ui-monospace, "SF Mono", "Cascadia Code", Consolas, monospace;
+  --font-sans: "Fusion Pixel", system-ui, -apple-system, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Source Han Sans SC", "Noto Sans CJK SC", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif;
 
   /* Spacing */
   --content-width: 960px;
@@ -931,19 +933,24 @@ table tr:nth-child(even) td {
   em { color: var(--text-secondary); }
 }
 
-/* WaveDrom rendered diagrams */
+/* WaveDrom rendered diagrams — 横向滚动窗口：超长时序图保持原始宽度，
+   不缩小，容器内横向滚动阅读 */
 .post-content .wavedrom,
 .post-content script[type="WaveDrom"] {
   display: block;
+  max-width: 100%;
   margin: 1.2em auto;
   overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px; /* 给横向滚动条留空间 */
 }
 
 .post-content .wavedrom svg {
   background: var(--bg-secondary);
   border: 3px solid #000;
-  max-width: 100%;
+  max-width: none; /* 关键：禁止缩放，保持波形原始宽度 */
   height: auto;
+  display: block;
 }
 
 .post-content .wavedrom-error {
@@ -955,18 +962,20 @@ table tr:nth-child(even) td {
   background: var(--bg-tertiary);
 }
 
-/* Mermaid diagrams */
+/* Mermaid diagrams — 同样横向滚动，宽图不缩放 */
 .post-content .mermaid {
-  display: flex;
-  justify-content: center;
+  display: block;
   margin: 1.2em 0;
   overflow-x: auto;
+  overflow-y: hidden;
   background: var(--bg-secondary);
   border: 3px solid #000;
   padding: 20px;
 }
 .post-content .mermaid svg {
-  max-width: 100%;
+  display: block;
+  margin: 0 auto; /* 短图居中；超宽时可完整滚动到左侧 */
+  max-width: none;
   height: auto;
 }
 

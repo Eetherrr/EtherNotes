@@ -2,7 +2,7 @@
 
 # EtherNotes — Obsidian 风格 wikilink 转换器
 #
-# 在渲染前把 Obsidian 语法转成 Jekyll/kramdown 能处理的形式：
+# 在 kramdown 渲染之前，把 Obsidian 语法重写为标准 Markdown/HTML：
 #   [[目标|别名]]        → <a href="...">别名</a>
 #   [[目标]]             → <a href="...">目标</a>
 #   ![[图片.png]]        → <img src="..." alt="图片.png" />
@@ -12,10 +12,9 @@
 #   - 文章链接目标 = 文章 frontmatter 的 title 或文件名（不含扩展名）
 #   - 图片目标 = docs/assets/ 下的静态文件名（basename → 路径）
 #
-# 转换发生两次（双保险）：
-#   1. pre_render：改写 Markdown（跳过 ```/~~~ 代码块），
-#      让 kramdown 直接看到干净的语法；
-#   2. post_render：兜底清理输出 HTML 里残留的 [[...]]（跳过 <pre> 块）。
+# 时机：`:site, :post_read`（所有文档读取完成后、任何渲染发生之前），
+#       直接改写 document.content，kramdown 只会看到干净的内容。
+#       逐行跳过 ```/~~~ 代码围栏与缩进代码块，避免误伤代码。
 
 module EtherNotes
   module Wikilinks
@@ -24,7 +23,7 @@ module EtherNotes
 
     module_function
 
-    # ---- 索引（按 site 缓存一次） ----
+    # ---- 索引（构建一次，挂在 site.data 上） ----
 
     def maps(site)
       cached = site.data["wikilinks_maps"]
@@ -39,9 +38,10 @@ module EtherNotes
 
       asset_map = {}
       site.static_files.each do |f|
-        next unless f.relative_path.start_with?("/assets/")
+        # Jekyll 4 的 relative_path 不带前导斜杠（"assets/images/x.png"）
+        next unless f.relative_path.start_with?("assets/")
 
-        asset_map[f.basename] = site.baseurl.to_s + f.relative_path
+        asset_map[f.basename] = [site.baseurl.to_s, f.relative_path].join("/")
       end
 
       site.data["wikilinks_maps"] = [post_map, asset_map]
@@ -73,51 +73,40 @@ module EtherNotes
       end
     end
 
-    # 输出不含 [[...]]，避免再被后续 gsub 二次匹配
+    # 输出不含 [[...]]，避免被后续 gsub 二次匹配
     def missing(kind, name)
       label = kind == :image ? "图片缺失" : "链接缺失"
       %(<span class="wikilink-missing" data-wikilink="#{name}" title="#{label}: #{name}">#{label}: #{name}</span>)
     end
 
-    # ---- Markdown（pre_render） ----
+    # ---- Markdown 转换（逐行，跳过代码块） ----
 
     def transform_markdown(content, post_map, asset_map)
       return content unless content.include?("[[")
-      return content if content.include?("```") || content.include?("~~~")
 
-      content.gsub(IMG_RE) { img_replace(Regexp.last_match, post_map, asset_map) }
-             .gsub(LINK_RE) { link_replace(Regexp.last_match, post_map, asset_map) }
-    end
-
-    # ---- HTML（post_render，兜底） ----
-
-    def transform_html(html, post_map, asset_map)
-      return html unless html.include?("[[")
-
-      segments = html.split(%r{(<pre[\s>].*?</pre>)}m)
-      segments.map! do |seg|
-        if seg.start_with?("<pre")
-          seg
+      in_fence = false
+      content.each_line.map do |line|
+        if line =~ /^\s*(```|~~~)/
+          in_fence = !in_fence
+          line
+        elsif in_fence || line =~ /^( {4}|\t)/
+          # 代码围栏内 / 缩进代码块：原样保留
+          line
         else
-          seg.gsub(IMG_RE) { img_replace(Regexp.last_match, post_map, asset_map) }
-             .gsub(LINK_RE) { link_replace(Regexp.last_match, post_map, asset_map) }
+          line.gsub(IMG_RE) { img_replace(Regexp.last_match, post_map, asset_map) }
+              .gsub(LINK_RE) { link_replace(Regexp.last_match, post_map, asset_map) }
         end
-      end
-      segments.join
+      end.join
     end
   end
 end
 
-Jekyll::Hooks.register [:posts, :pages], :pre_render do |doc, _payload|
-  next unless doc.respond_to?(:content) && doc.content.is_a?(String)
+Jekyll::Hooks.register :site, :post_read do |site|
+  post_map, asset_map = EtherNotes::Wikilinks.maps(site)
 
-  post_map, asset_map = EtherNotes::Wikilinks.maps(doc.site)
-  doc.content = EtherNotes::Wikilinks.transform_markdown(doc.content, post_map, asset_map)
-end
+  (site.posts.docs + site.pages).each do |doc|
+    next unless doc.respond_to?(:content) && doc.content.is_a?(String)
 
-Jekyll::Hooks.register [:posts, :pages], :post_render do |doc, _payload|
-  next unless doc.respond_to?(:output) && doc.output.is_a?(String)
-
-  post_map, asset_map = EtherNotes::Wikilinks.maps(doc.site)
-  doc.output = EtherNotes::Wikilinks.transform_html(doc.output, post_map, asset_map)
+    doc.content = EtherNotes::Wikilinks.transform_markdown(doc.content, post_map, asset_map)
+  end
 end

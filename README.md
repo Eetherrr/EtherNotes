@@ -6,7 +6,7 @@
 
 由 [GitHub Pages] + [Jekyll] 构建，使用 [Obsidian] 作为本地写作工具，推送到 `main` 分支后由 GitHub Actions 自动构建部署。
 
-🎨 **主题**：8-bit 像素风，字体为 [Fusion Pixel 缝合像素字体](https://github.com/TakWolf/fusion-pixel-font)（OFL 1.1 许可，见 `docs/assets/fonts/OFL.txt`），本地加载无 CDN 依赖。
+🎨 **主题**：8-bit 像素风，字体为 [Fusion Pixel 缝合像素字体](https://github.com/TakWolf/fusion-pixel-font)（OFL 1.1 许可，见 `docs/assets/fonts/OFL.txt`），本地加载无 CDN 依赖；缺字回退系统柔和黑体（苹方 / MiSans / 微软雅黑，不回退宋体楷体）。
 
 [GitHub Pages]: https://pages.github.com/
 [Jekyll]: https://jekyllrb.com/
