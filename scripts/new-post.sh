@@ -39,8 +39,8 @@ if [ -e "$FILE" ]; then
   exit 1
 fi
 
-# categories = 目录路径
-CATS="$(printf '%s' "$DIR" | tr '/' ' ')"
+# categories = 目录路径（flow 列表需要逗号分隔）
+CATS="$(printf '%s' "$DIR" | sed 's|/|, |g')"
 
 # 若目录下已有文章，order = 现有文章数
 ORDER=""

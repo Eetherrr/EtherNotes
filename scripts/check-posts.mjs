@@ -38,9 +38,20 @@ function parseFrontmatter(text) {
   if (endIdx < 0) return {};
   const block = text.slice(3, endIdx);
   const out = {};
+  let curKey = null; // 值在后续块列表行中的键
   for (const line of block.split("\n")) {
-    const m = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
-    if (m) out[m[1]] = m[2].trim();
+    // 顶层键值: key: value
+    const top = line.match(/^([A-Za-z0-9_-]+):\s*(.*)$/);
+    if (top) {
+      curKey = top[1];
+      out[curKey] = top[2].trim();
+      continue;
+    }
+    // 块列表项（缩进的 - item），归入当前键
+    if (curKey && /^\s*-\s+/.test(line)) {
+      const item = line.trim().replace(/^-\s+/, "").trim();
+      out[curKey] = out[curKey] ? `${out[curKey]}, ${item}` : item;
+    }
   }
   return out;
 }
@@ -64,6 +75,21 @@ for (const file of walk(POSTS_DIR)) {
   for (const key of ["layout", "title", "date", "categories"]) {
     if (!fm[key]) {
       errors.push(`缺少 frontmatter 字段 "${key}": ${rel}`);
+    }
+  }
+
+  // categories 应与目录路径一致（决定 URL，不一致仅告警不阻断）
+  if (fm.categories) {
+    const dirPath = rel.split("/").slice(0, -1).join("/");
+    const catsNorm = fm.categories
+      .replace(/[[\]"'#]/g, "")
+      .split(/[,\s]+/)
+      .filter(Boolean)
+      .join("/");
+    if (catsNorm !== dirPath) {
+      warnings.push(
+        `categories (${fm.categories}) 与目录路径 (${dirPath}) 不一致，URL 会偏离目录结构: ${rel}`
+      );
     }
   }
 
