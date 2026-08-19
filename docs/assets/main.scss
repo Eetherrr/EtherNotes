@@ -1117,6 +1117,9 @@ table tr:nth-child(even) td {
   display: flex;
   gap: 40px;
   align-items: flex-start;
+  /* 侧栏贴屏幕左侧：放开 960px 限宽，文章列在剩余空间中居中 */
+  max-width: none;
+  padding: 20px 32px 0;
 }
 
 .post-sidebar {
@@ -1222,12 +1225,24 @@ table tr:nth-child(even) td {
 .has-sidebar .post-header {
   text-align: left;
   padding: 0 0 20px;
-  max-width: none;
+  /* 文章列在侧栏右侧剩余空间中水平居中，限阅读舒适宽度 */
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .has-sidebar .post-content {
-  max-width: none;
+  max-width: 720px;
+  width: 100%;
+  margin: 0 auto;
   padding: 0 0 40px;
+}
+
+.has-sidebar .post-series-nav {
+  max-width: 720px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Series prev/next navigation — 像素按钮 */

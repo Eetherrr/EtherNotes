@@ -3,7 +3,7 @@ layout: post
 title: I2C 实现
 date: 2026-08-12
 categories: [fpga, protocol, i2c]
-order: 2
+order: 3
 ---
 
 # 主机控制的Verilog实现

@@ -3,7 +3,7 @@ layout: post
 title: I2C 协议层
 date: 2026-08-12
 categories: [fpga, protocol, i2c]
-order: 0
+order: 1
 ---
 
 - 时序
@@ -59,12 +59,26 @@ order: 0
 
 ### 随机读时序
 - 随机读操作，单字节地址
-  
-    <-待补充->
+
+```wavedrom
+{
+  signal: [
+    { name: "SCL", wave: "n..|....|..|....|..|n..|....|..|....|..|.." },
+    { name: "SDA", wave: "34.|563.|6.|563.|6.|34.|563.|6.|465.|6.|67", data: "start dev_addr r/w ack word_addr ack restart dev_addr r/w ack data nack stop" }
+  ]
+}
+```
 
 - 随机读操作，2字节地址
-  
-    <-待补充->
+
+```wavedrom
+{
+  signal: [
+    { name: "SCL", wave: "n..|....|..|....|..|....|..|n..|....|..|....|..|.." },
+    { name: "SDA", wave: "34.|563.|6.|563.|6.|563.|6.|34.|563.|6.|465.|6.|67", data: "start dev_addr r/w ack word_addr_h ack word_addr_l ack restart dev_addr r/w ack data nack stop" }
+  ]
+}
+```
 
 
 #### 附注
@@ -75,8 +89,24 @@ order: 0
 I2C顺序读操作就是对寄存器或存储单元数据的顺序读取。假如要读取n字节连续数据，只需写入要读取第一个字节数据的存储地址，就可以实现连续n字节数据的顺序读取
 - 顺序读操作，单字节地址
 
-    <-待补充->
+```wavedrom
+{
+  signal: [
+    { name: "SCL", wave: "n..|....|..|....|..|n..|....|..|....|..|x.|....|..|.." },
+    { name: "SDA", wave: "34.|563.|6.|563.|6.|34.|563.|6.|465.|6.|x.|465.|6.|67", data: "start dev_addr r/w ack word_addr ack restart dev_addr r/w ack data(1) ack ... data(n) nack stop" }
+  ]
+}
+```
 
 - 顺序读操作，2字节地址
 
-    <-待补充->
+```wavedrom
+{
+  signal: [
+    { name: "SCL", wave: "n..|....|..|....|..|....|..|n..|....|..|....|..|x.|....|..|.." },
+    { name: "SDA", wave: "34.|563.|6.|563.|6.|563.|6.|34.|563.|6.|465.|6.|x.|465.|6.|67", data: "start dev_addr r/w ack word_addr_h ack word_addr_l ack restart dev_addr r/w ack data(1) ack ... data(n) nack stop" }
+  ]
+}
+```
+
+> 顺序读与随机读的区别：每读完一字节，主机回 **ACK**（不是 NACK），从机地址指针自动 +1 送出下一字节；只有读到**最后一字节**主机才回 NACK，随后发停止信号。
