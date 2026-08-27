@@ -5,7 +5,6 @@ date: 2026-08-19
 categories: [fpga, protocol, spi]
 order: 2
 ---
-
 # SPI 物理层
 
 SPI 的物理层很简单：**4 根单向信号线 + 推挽驱动**。相比 I2C 的开漏结构，SPI 的电气特性决定了它能跑出远高于 I2C 的速率。

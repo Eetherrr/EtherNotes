@@ -5,7 +5,6 @@ date: 2026-08-12
 categories: [fpga, protocol, spi]
 order: 0
 ---
-
 # 介绍
 
 - SPI（Serial Peripheral Interface，串行外围设备接口）是一种高速、全双工的同步串行通信协议

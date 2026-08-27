@@ -5,7 +5,6 @@ date: 2026-08-19
 categories: [fpga, protocol, spi]
 order: 1
 ---
-
 # SPI 协议层详解
 
 ## 一次完整传输的流程
