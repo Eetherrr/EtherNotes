@@ -6,7 +6,7 @@ categories:
   - misc
   - verilog
 ---
-# Instance
+# Instance with FSM
 
 ```verilog
 `define RST_EN 1'b0
@@ -52,6 +52,15 @@ module UpperCamelCase#(
 			default : state_n <= ST_IDLE;
 		end
 	end
+	
+	// Other Codes...
+	
+	assign idle_wr = ...;
+	assign idle_wr = ...;
+	assign idle_wr = ...;
+	assign idle_wr = ...;
 
 endmodule
 ```
+
+# Instance 
