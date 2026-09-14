@@ -6,7 +6,7 @@ categories:
   - misc
   - verilog
 ---
-# Instance with FSM
+# Example with FSM
 
 ```verilog
 `define RST_EN 1'b0
