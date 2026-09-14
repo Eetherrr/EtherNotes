@@ -62,5 +62,3 @@ module UpperCamelCase#(
 
 endmodule
 ```
-
-# Instance 
